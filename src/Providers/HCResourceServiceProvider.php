@@ -30,6 +30,8 @@ declare(strict_types = 1);
 namespace HoneyComb\Resources\Providers;
 
 use HoneyComb\Core\Providers\HCBaseServiceProvider;
+use HoneyComb\Resources\Repositories\HCResourceRepository;
+use HoneyComb\Resources\Services\HCResourceService;
 
 /**
  * Class HCResourceServiceProvider
@@ -55,4 +57,34 @@ class HCResourceServiceProvider extends HCBaseServiceProvider
      * @var string
      */
     protected $namespace = 'HoneyComb\Resources\Http\Controllers';
+
+    /**
+     *
+     */
+    public function register(): void
+    {
+        $this->mergeConfigFrom(
+            $this->packagePath('config/resources.php'), 'hc'
+        );
+
+        $this->registerRepositories();
+
+        $this->registerServices();
+    }
+
+    /**
+     *
+     */
+    private function registerRepositories(): void
+    {
+        $this->app->singleton(HCResourceRepository::class);
+    }
+
+    /**
+     *
+     */
+    private function registerServices(): void
+    {
+        $this->app->singleton(HCResourceService::class);
+    }
 }
