@@ -1,5 +1,5 @@
 {
-    "name": "HCResource",
+    "name": "honey-comb/resources",
     "description": "Honeycomb media library",
     "keywords": ["honeycomb", "honey", "laravel", "cms", "resources"],
     "homepage": "https://github.com/honey-comb/resources",
