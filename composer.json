@@ -21,7 +21,9 @@
     "require": {
         "php": ">=7.1.0",
         "laravel/framework": "5.5.*",
-        "honey-comb/core": "0.1.*"
+        "honey-comb/core": "0.1.*",
+        "intervention/image": "^2.4",
+        "php-ffmpeg/php-ffmpeg": "^0.10"
     },
     "require-dev": {
         "brianium/paratest": "^1.0",
