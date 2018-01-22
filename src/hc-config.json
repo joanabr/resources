@@ -1,0 +1,14 @@
+{
+    "general": {
+        "packageName": "HCResource",
+        "sequence": 0,
+        "namespace": "HoneyComb\\Resources\\"
+    },
+    "formData": {},
+    "adminMenu": [],
+    "seeder": "",
+    "routes": [],
+    "acl": {
+        "permissions": []
+    }
+}

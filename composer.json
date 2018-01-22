@@ -1,0 +1,18 @@
+{
+    "name": "HCResource",
+    "description": "",
+    "keywords": [],
+    "license": "MIT",
+    "authors": [],
+    "repositories": [],
+    "require": {
+        "php": ">=7.1.0",
+        "laravel/framework": "5.5.*",
+        "honey-comb/core": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "honey-comb/resources": "src/"
+        }
+    }
+}
