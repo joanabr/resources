@@ -31,7 +31,7 @@ class HCResourceController extends HCBaseController
         $storagePath = storage_path('app/');
 
         if (is_null($id)) {
-            logger()->info(trans('HCResource::resources.file_missing', ['data' => $id]));
+            logger()->info(trans('HCResource::resource.file_missing', ['data' => $id]));
             exit;
         }
 
@@ -41,12 +41,12 @@ class HCResourceController extends HCBaseController
         });
 
         if (!$resource) {
-            logger()->info(trans('HCResource::resources.file_missing', ['data' => $id]));
+            logger()->info(trans('HCResource::resource.file_missing', ['data' => $id]));
             exit;
         }
 
         if (!Storage::exists($resource->path)) {
-            logger()->info(trans('HCResource::resources.file_missing', ['data' => $id . ' ' . $resource->path]));
+            logger()->info(trans('HCResource::resource.file_missing', ['data' => $id . ' ' . $resource->path]));
             exit;
         }
 
