@@ -30,6 +30,8 @@ declare(strict_types = 1);
 namespace HoneyComb\Resources\Models;
 
 use HoneyComb\Core\Models\HCUuidModel;
+use HoneyComb\Core\Models\Traits\HCTranslation;
+
 
 /**
  * Class HCResource
@@ -37,6 +39,8 @@ use HoneyComb\Core\Models\HCUuidModel;
  */
 class HCResource extends HCUuidModel
 {
+    use HCTranslation;
+
     /**
      * The database table used by the model.
      *
