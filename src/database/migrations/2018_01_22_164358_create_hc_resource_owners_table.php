@@ -19,14 +19,14 @@ class CreateHcResourceOwnersTable extends Migration
             $table->datetime('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->datetime('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
 
-            $table->uuid('resource_id');
+            $table->uuid('record_id');
             $table->uuid('owner_id');
             $table->string('owner_type');
 
             $table->index(["owner_id", "owner_type"]);
-            $table->unique(['resource_id', 'owner_id', 'owner_type']);
+            $table->unique(['record_id', 'owner_id', 'owner_type']);
 
-            $table->foreign('resource_id')->references('id')->on('hc_resources')->onUpdate('NO ACTION')->onDelete('NO ACTION');
+            $table->foreign('record_id')->references('id')->on('hc_resources')->onUpdate('NO ACTION')->onDelete('NO ACTION');
         });
     }
 
