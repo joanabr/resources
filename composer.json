@@ -1,18 +1,53 @@
 {
     "name": "HCResource",
-    "description": "",
-    "keywords": [],
+    "description": "Honeycomb media library",
+    "keywords": ["honeycomb", "honey", "laravel", "cms", "resources"],
+    "homepage": "https://github.com/honey-comb/resources",
     "license": "MIT",
-    "authors": [],
-    "repositories": [],
+    "authors": [
+        {
+            "name": "Mantas Paulauskas",
+            "email": "mp@interactivesolutions.lt"
+        },
+        {
+            "name": "Jevgenij Dmitrijev",
+            "email": "jd@interactivesolutions.lt"
+        },
+        {
+            "name": "Vytautas Rimeikis",
+            "email": "vytautas.rimeikis@gmail.com"
+        }
+    ],
     "require": {
         "php": ">=7.1.0",
         "laravel/framework": "5.5.*",
-        "honey-comb/core": "*"
+        "honey-comb/core": "0.1.*"
+    },
+    "require-dev": {
+        "brianium/paratest": "^1.0",
+        "mockery/mockery": "^1.0",
+        "orchestra/testbench-browser-kit": "^3.5",
+        "phpunit/phpunit": "^6.4"
     },
     "autoload": {
         "psr-4": {
-            "honey-comb/resources": "src/"
+            "HoneyComb\\Resources\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": [
+            "paratest -p4 --colors"
+        ]
+    },
+    "config": {
+        "secure-http": false,
+        "platform": {
+            "php": "7.1"
         }
     }
 }
