@@ -100,9 +100,8 @@ class HCResourceService
                 $this->removeImageFromStorage($resource);
             }
 
-            throw new \Exception($e);
+            throw $e;
         }
-
 
         if ($full) {
             return $resource->toArray();
@@ -124,7 +123,7 @@ class HCResourceService
      * @return array|mixed|null
      * @throws \Exception
      */
-    public function downloadResource(string $source, bool $full = null, string $id = null, string $mime_type = null)
+    public function download(string $source, bool $full = null, string $id = null, string $mime_type = null)
     {
         $this->createFolder('uploads/tmp');
 
@@ -137,7 +136,7 @@ class HCResourceService
             file_put_contents($destination, file_get_contents($source));
 
             if (filesize($destination) <= config('resources.max_checksum_size', self::MAX_CHECKSUM_SIZE)) {
-                $resource = $this->repository->findOneBy(['checksum', hash_file('sha256', $destination)]);
+                $resource = $this->repository->findOneBy(['checksum' => hash_file('sha256', $destination)]);
 
                 if (!$this->allowDuplicates && $resource) {
                     //If duplicate found deleting downloaded file
@@ -188,9 +187,11 @@ class HCResourceService
 
         $params['original_name'] = $file->getClientOriginalName();
         $params['extension'] = '.' . $file->getClientOriginalExtension();
-        $params['path'] = $this->uploadPath . $params['id'] . $params['extension'];
+        $params['safe_name'] = $params['id'] . $params['extension'];
+        $params['path'] = $this->uploadPath . $params['safe_name'];
         $params['size'] = $file->getClientSize();
         $params['mime_type'] = $file->getClientMimeType();
+        $params['uploaded_by'] = auth()->id();
 
         return $params;
     }
@@ -201,12 +202,14 @@ class HCResourceService
      * @param $resource
      * @param $file
      */
-    protected function saveResourceInStorage(HCResources $resource, UploadedFile $file): void
+    protected function saveResourceInStorage(HCResource $resource, UploadedFile $file): void
     {
         $this->createFolder($this->uploadPath);
 
-        $file->move(storage_path('app/' . $this->uploadPath),
-            $resource->id . '.' . $file->getClientOriginalExtension());
+        $file->move(
+            storage_path('app/' . $this->uploadPath),
+            $resource->id . '.' . $file->getClientOriginalExtension()
+        );
     }
 
     /**
