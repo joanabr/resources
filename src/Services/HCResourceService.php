@@ -102,6 +102,11 @@ class HCResourceService
         } else {
 
             switch ($resource->mime_type) {
+                case 'text/plain' :
+                    if ($resource->extension == '.svg') {
+
+                        $resource->mime_type = 'image/svg+xml';
+                    }
                 case 'image/png' :
                 case 'image/jpeg' :
                 case 'image/jpg' :
@@ -293,6 +298,8 @@ class HCResourceService
         } else {
             $params['id'] = Uuid::uuid4()->toString();
         }
+
+        // TODO test with .svg
 
         $params['original_name'] = $file->getClientOriginalName();
         $params['extension'] = '.' . $file->getClientOriginalExtension();
