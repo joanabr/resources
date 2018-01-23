@@ -59,6 +59,13 @@ class HCResourceServiceProvider extends HCBaseServiceProvider
     protected $namespace = 'HoneyComb\Resources\Http\Controllers';
 
     /**
+     * Provider name
+     *
+     * @var string
+     */
+    protected $packageName = 'HCResource';
+
+    /**
      *
      */
     public function register(): void
