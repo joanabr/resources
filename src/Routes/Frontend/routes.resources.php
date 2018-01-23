@@ -27,8 +27,7 @@
 
 declare(strict_types = 1);
 
-Route::prefix('auth')
-    ->namespace('Frontend')
+Route::namespace('Frontend')
     ->middleware('web')
     ->group(
         function () {
