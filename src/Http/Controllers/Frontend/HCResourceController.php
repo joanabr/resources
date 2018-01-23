@@ -10,6 +10,7 @@ use HoneyComb\Core\Http\Controllers\HCBaseController;
 use HoneyComb\Resources\Models\HCResource;
 use Image;
 use Intervention\Image\Constraint;
+use Storage;
 
 /**
  * Class HCResourceController
@@ -93,7 +94,7 @@ class HCResourceController extends HCBaseController
                             //TODO: generate 3-5 previews and take the one with largest size
                             $this->generateVideoPreview($resource, $storagePath, $previewPath);
 
-                            createImage($videoPreview, $cachePath, $width, $height, $fit);
+                            $this->createImage($videoPreview, $cachePath, $width, $height, $fit);
 
                             $resource->size = File::size($cachePath);
                             $resource->path = $cachePath;
