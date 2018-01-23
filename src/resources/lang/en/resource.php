@@ -9,5 +9,4 @@ return [
     'extension' => 'Extension',
     'mime_type' => 'Mime Type',
     'uploaded_by' => 'Uploaded by',
-    'file_missing' => 'File is missing: :data',
 ];
