@@ -369,6 +369,9 @@ class HCResourceService
         $explodeFileURL = explode('/', $fileName);
         $fileName = end($explodeFileURL);
 
+        $explodedByParams = explode('?', $fileName);
+        $fileName = head($explodedByParams);
+
         return sanitizeString(pathinfo($fileName, PATHINFO_FILENAME)) . '.' . pathinfo($fileName, PATHINFO_EXTENSION);
     }
 
