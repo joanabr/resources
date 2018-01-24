@@ -31,6 +31,12 @@ Route::namespace('Frontend')
     ->middleware('web')
     ->group(
         function () {
+            Route::post('resources/upload', 'HCResourceController@upload')
+                ->name('resource.upload')
+                ->middleware('auth');
+
             Route::get('resources/{id}/{width?}/{height?}/{fit?}', 'HCResourceController@show')->name('resource.get');
         }
     );
+
+

@@ -9,6 +9,7 @@ use HoneyComb\Core\Http\Controllers\Traits\HCAdminListHeaders;
 use HoneyComb\Resources\Http\Request\HCResourceRequest;
 use HoneyComb\Resources\Services\HCResourceService;
 use Illuminate\Database\Connection;
+use Illuminate\Http\JsonResponse;
 
 /**
  * Class HCResourceController
