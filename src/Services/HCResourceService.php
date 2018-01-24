@@ -300,10 +300,12 @@ class HCResourceService
         }
 
         // TODO test with .svg
+        $extension = $this->getExtension($file);
 
+        // TODO add extension to original when original name is not well formed
         $params['original_name'] = $file->getClientOriginalName();
-        $params['extension'] = '.' . $file->getClientOriginalExtension();
-        $params['safe_name'] = $params['id'] . $params['extension'];
+        $params['extension'] = $extension;
+        $params['safe_name'] = $params['id'] . $extension;
         $params['path'] = $this->uploadPath . $params['safe_name'];
         $params['size'] = $file->getClientSize();
         $params['mime_type'] = $file->getClientMimeType();
@@ -324,7 +326,7 @@ class HCResourceService
 
         $file->move(
             storage_path('app/' . $this->uploadPath),
-            $resource->id . '.' . $file->getClientOriginalExtension()
+            $resource->id . $this->getExtension($file)
         );
     }
 
@@ -477,5 +479,18 @@ class HCResourceService
         $image->save($destination);
 
         return true;
+    }
+
+    /**
+     * @param UploadedFile $file
+     * @return string
+     */
+    private function getExtension(UploadedFile $file): string
+    {
+        if (!$extension = $file->getClientOriginalExtension()) {
+            $extension = '.' . explode('/', $file->getClientMimeType())[1];
+        }
+
+        return $extension;
     }
 }
