@@ -72,12 +72,12 @@ class HCResourceService
      */
     public function show(?string $id, int $width, int $height, bool $fit): void
     {
-        $storagePath = storage_path('app/');
-
         if (is_null($id)) {
             logger()->info('resourceId is null');
             exit;
         }
+
+        $storagePath = storage_path('app/');
 
         // cache resource for 10 days
         $resource = \Cache::remember($id, 14400, function () use ($id) {
