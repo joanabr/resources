@@ -65,6 +65,14 @@ class HCResourceService
     }
 
     /**
+     * @return HCResourceRepository
+     */
+    public function getRepository(): HCResourceRepository
+    {
+        return $this->repository;
+    }
+
+    /**
      * @param null|string $id
      * @param int $width
      * @param int $height
