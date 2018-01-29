@@ -4,9 +4,7 @@
         "sequence": 0,
         "namespace": "HoneyComb\\Resources\\"
     },
-    "formData": {
-        "resource": "HoneyComb\\Resources\\Forms\\HCResourceForm"
-    },
+    "formData": {},
     "adminMenu": [
         {
             "route": "admin.resource.index",
