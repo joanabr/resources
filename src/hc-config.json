@@ -4,13 +4,33 @@
         "sequence": 0,
         "namespace": "HoneyComb\\Resources\\"
     },
-    "formData": {},
-    "adminMenu": [],
+    "formData": {
+        "resource": "HoneyComb\\Resources\\Forms\\HCResourceForm"
+    },
+    "adminMenu": [
+        {
+            "route": "admin.resource.index",
+            "parent": "admin.index",
+            "translation": "HCResource::resource.page_title",
+            "icon": "files",
+            "aclPermission": "honey_comb_resources_resource_list"
+        }
+    ],
     "seeder": "",
     "routes": [
-        "Routes/Frontend/routes.resources.php"
+        "Routes\/Frontend\/routes.resources.php",
+        "Routes\/Admin\/routes.resources.php"
     ],
     "acl": {
-        "permissions": []
+        "permissions": {
+            "name": "acl.resource",
+            "controller": "HoneyComb\\Resources\\Http\\Controllers\\Admin\\HCResourceController",
+            "actions": [
+                "honey_comb_resources_resource_delete",
+                "honey_comb_resources_resource_delete_force",
+                "honey_comb_resources_resource_restore",
+                "honey_comb_resources_resource_list"
+            ]
+        }
     }
 }
