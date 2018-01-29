@@ -29,9 +29,9 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Providers;
 
-use HoneyComb\Core\Providers\HCBaseServiceProvider;
 use HoneyComb\Resources\Repositories\HCResourceRepository;
 use HoneyComb\Resources\Services\HCResourceService;
+use HoneyComb\Starter\Providers\HCBaseServiceProvider;
 
 /**
  * Class HCResourceServiceProvider
