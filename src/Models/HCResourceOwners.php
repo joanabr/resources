@@ -29,7 +29,7 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Models;
 
-use HoneyComb\Core\Models\HCUuidModel;
+use HoneyComb\Starter\Models\HCUuidModel;
 
 
 /**
