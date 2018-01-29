@@ -29,9 +29,8 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Models;
 
-use HoneyComb\Core\Models\HCUuidModel;
 use HoneyComb\Core\Models\Traits\HCTranslation;
-
+use HoneyComb\Starter\Models\HCUuidModel;
 
 /**
  * Class HCResource
