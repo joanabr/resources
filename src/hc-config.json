@@ -12,7 +12,7 @@
             "route": "admin.resource.index",
             "parent": "admin.index",
             "translation": "HCResource::resource.page_title",
-            "icon": "files",
+            "icon": "images",
             "aclPermission": "honey_comb_resources_resource_list"
         }
     ],
