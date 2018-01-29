@@ -9,4 +9,5 @@ return [
     'extension' => 'Plėtinys',
     'mime_type' => 'Mime Tipas',
     'uploaded_by' => 'Įkėlė',
+    'preview' => 'Peržiūra',
 ];

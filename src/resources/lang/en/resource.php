@@ -9,4 +9,5 @@ return [
     'extension' => 'Extension',
     'mime_type' => 'Mime Type',
     'uploaded_by' => 'Uploaded by',
+    'preview' => 'Preview',
 ];
