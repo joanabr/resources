@@ -29,23 +29,23 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Http\Controllers\Frontend;
 
+use HoneyComb\Core\Http\Controllers\HCBaseController;
 use HoneyComb\Resources\Http\Request\HCResourceRequest;
 use HoneyComb\Resources\Services\HCResourceService;
 use HoneyComb\Starter\Helpers\HCFrontendResponse;
 use Illuminate\Database\Connection;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Routing\Controller;
 
 /**
  * Class HCResourceController
  * @package HoneyComb\Resources\Http\Controllers\Frontend
  */
-class HCResourceController extends Controller
+class HCResourceController extends HCBaseController
 {
     /**
      * @var HCResourceService
      */
-    private $service;
+    protected $service;
 
     /**
      * @var Connection

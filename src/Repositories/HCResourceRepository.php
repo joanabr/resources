@@ -29,6 +29,7 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Repositories;
 
+use HoneyComb\Core\Repositories\Traits\HCQueryBuilderTrait;
 use HoneyComb\Resources\Models\HCResource;
 use HoneyComb\Starter\Repositories\HCBaseRepository;
 use Illuminate\Http\UploadedFile;
@@ -39,6 +40,7 @@ use Illuminate\Http\UploadedFile;
  */
 class HCResourceRepository extends HCBaseRepository
 {
+    use HCQueryBuilderTrait;
     /**
      * @return string
      */
