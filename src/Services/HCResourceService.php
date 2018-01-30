@@ -317,7 +317,7 @@ class HCResourceService
         $params['path'] = $this->uploadPath . $params['safe_name'];
         $params['size'] = $file->getClientSize();
         $params['mime_type'] = $file->getClientMimeType();
-        $params['uploaded_by'] = auth()->id();
+        $params['uploaded_by'] = auth()->check() ? auth()->id() : null;
 
         return $params;
     }
