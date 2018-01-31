@@ -196,8 +196,6 @@ class HCResourceService
             throw new \Exception(trans('resources::resources.errors.no_resource_selected'));
         }
 
-        dd($this->getFileParams($file));
-
         $this->resourceId = $id;
 
         try {
