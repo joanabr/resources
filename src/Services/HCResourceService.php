@@ -196,6 +196,8 @@ class HCResourceService
             throw new \Exception(trans('resources::resources.errors.no_resource_selected'));
         }
 
+        dd($this->getFileParams($file));
+
         $this->resourceId = $id;
 
         try {
@@ -496,9 +498,9 @@ class HCResourceService
     private function getExtension(UploadedFile $file): string
     {
         if (!$extension = $file->getClientOriginalExtension()) {
-            $extension = '.' . explode('/', $file->getClientMimeType())[1];
+            $extension = explode('/', $file->getClientMimeType())[1];
         }
 
-        return $extension;
+        return '.' . $extension;
     }
 }
