@@ -4,7 +4,9 @@
         "sequence": 0,
         "namespace": "HoneyComb\\Resources\\"
     },
-    "formData": {},
+    "formData": {
+        "resource.author": "HoneyComb\\Resources\\Forms\\HCResourceAuthorForm"
+    },
     "adminMenu": [
         {
             "route": "admin.resource.index",
@@ -12,23 +14,45 @@
             "translation": "HCResource::resource.page_title",
             "icon": "images",
             "aclPermission": "honey_comb_resources_resource_list"
+        },
+        {
+            "route": "admin.resource.author.index",
+            "parent": "admin.resource.index",
+            "translation": "HCResource::resource_author.page_title",
+            "icon": "user-secret",
+            "aclPermission": "honey_comb_resources_resource_author_list"
         }
     ],
     "seeder": "",
     "routes": [
         "Routes\/Frontend\/routes.resources.php",
-        "Routes\/Admin\/routes.resources.php"
+        "Routes\/Admin\/routes.resources.php",
+        "Routes\/Admin\/routes.resource.authors.php"
     ],
     "acl": {
-        "permissions": {
-            "name": "acl.resource",
-            "controller": "HoneyComb\\Resources\\Http\\Controllers\\Admin\\HCResourceController",
-            "actions": [
-                "honey_comb_resources_resource_delete",
-                "honey_comb_resources_resource_delete_force",
-                "honey_comb_resources_resource_restore",
-                "honey_comb_resources_resource_list"
-            ]
-        }
+        "permissions": [
+            {
+                "name": "acl.resource",
+                "controller": "HoneyComb\\Resources\\Http\\Controllers\\Admin\\HCResourceController",
+                "actions": [
+                    "honey_comb_resources_resource_delete",
+                    "honey_comb_resources_resource_delete_force",
+                    "honey_comb_resources_resource_restore",
+                    "honey_comb_resources_resource_list"
+                ]
+            },
+            {
+                "name": "acl.resource.author",
+                "controller": "HoneyComb\\Resources\\Http\\Controllers\\Admin\\HCResourceAuthorController",
+                "actions": [
+                    "honey_comb_resources_resource_author_update",
+                    "honey_comb_resources_resource_author_create",
+                    "honey_comb_resources_resource_author_delete",
+                    "honey_comb_resources_resource_author_delete_force",
+                    "honey_comb_resources_resource_author_restore",
+                    "honey_comb_resources_resource_author_list"
+                ]
+            }
+        ]
     }
 }
