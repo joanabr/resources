@@ -10,6 +10,7 @@ return [
     'mime_type' => 'Mime Tipas',
     'uploaded_by' => 'Įkėlė',
     'preview' => 'Peržiūra',
+    'author' => 'Autorius',
     'title' => 'Pavadinimas',
     'caption' => 'Sąntrauka',
     'alt_text' => 'Alt text',
