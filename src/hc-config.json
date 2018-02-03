@@ -5,7 +5,8 @@
         "namespace": "HoneyComb\\Resources\\"
     },
     "formData": {
-        "resource.author": "HoneyComb\\Resources\\Forms\\HCResourceAuthorForm"
+        "resource.author": "HoneyComb\\Resources\\Forms\\HCResourceAuthorForm",
+        "resource": "HoneyComb\\Resources\\Forms\\HCResourceForm"
     },
     "adminMenu": [
         {

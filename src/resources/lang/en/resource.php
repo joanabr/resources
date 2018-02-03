@@ -10,4 +10,9 @@ return [
     'mime_type' => 'Mime Type',
     'uploaded_by' => 'Uploaded by',
     'preview' => 'Preview',
+    'author' => 'Author',
+    'title' => 'Title',
+    'caption' => 'Caption',
+    'alt_text' => 'Alt text',
+    'description' => 'Description',
 ];
