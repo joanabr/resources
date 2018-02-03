@@ -23,7 +23,7 @@ class CreateHcResourcesTable extends Migration
             $table->datetime('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
             $table->datetime('deleted_at')->nullable();
 
-            $table->uuid('uploaded_by', 36)->nullable();
+            $table->uuid('uploaded_by')->nullable();
             $table->string('path');
             $table->string('original_name');
             $table->string('safe_name');
