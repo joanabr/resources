@@ -88,13 +88,13 @@ class HCResourceForm extends HCBaseForm
                 [
                     'type' => 'singleLine',
                     'label' => trans('HCResource::resource.author'),
-                    'required' => 1,
                 ],
 
-            $prefix . 'translations.title' =>
+            $prefix . 'translations.label' =>
                 [
                     'type' => 'singleLine',
-                    'label' => trans('HCResource::resource.title'),
+                    'label' => trans('HCResource::resource.label'),
+                    'multiLanguage' => 1,
                     'required' => 1,
                 ],
 
@@ -102,21 +102,21 @@ class HCResourceForm extends HCBaseForm
                 [
                     'type' => 'textArea',
                     'label' => trans('HCResource::resource.caption'),
-                    'required' => 1,
+                    'multiLanguage' => 1,
                 ],
 
             $prefix . 'translations.alt_text' =>
                 [
                     'type' => 'singleLine',
                     'label' => trans('HCResource::resource.alt_text'),
-                    'required' => 1,
+                    'multiLanguage' => 1,
                 ],
 
             $prefix . 'translations.description' =>
                 [
                     'type' => 'textArea',
                     'label' => trans('HCResource::resource.description'),
-                    'required' => 1,
+                    'multiLanguage' => 1,
                 ],
         ];
     }

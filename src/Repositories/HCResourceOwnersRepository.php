@@ -19,4 +19,53 @@ class HCResourceOwnersRepository extends HCBaseRepository
     {
         return HCResourceOwners::class;
     }
+
+    /**
+     * Soft deleting records
+     * @param $ids
+     */
+    public function deleteSoft(array $ids): void
+    {
+        $records = $this->makeQuery()->whereIn('id', $ids)->get();
+
+        foreach ($records as $record) {
+            /** @var HCResourceOwners $record */
+            $record->translations()->delete();
+            $record->delete();
+        }
+    }
+
+    /**
+     * Restore soft deleted records
+     *
+     * @param array $ids
+     * @return void
+     */
+    public function restore(array $ids): void
+    {
+        $records = $this->makeQuery()->withTrashed()->whereIn('id', $ids)->get();
+
+        foreach ($records as $record) {
+            /** @var HCResourceOwners $record */
+            $record->translations()->restore();
+            $record->restore();
+        }
+    }
+
+    /**
+     * Force delete records by given id
+     *
+     * @param array $ids
+     * @return void
+     */
+    public function deleteForce(array $ids): void
+    {
+        $records = $this->makeQuery()->withTrashed()->whereIn('id', $ids)->get();
+
+        foreach ($records as $record) {
+            /** @var HCResourceOwners $record */
+            $record->translations()->forceDelete();
+            $record->forceDelete();
+        }
+    }
 }

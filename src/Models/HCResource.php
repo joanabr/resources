@@ -64,6 +64,11 @@ class HCResource extends HCUuidModel
         "checksum",
     ];
 
+    protected $with = [
+        'translation',
+        'translations'
+    ];
+
     /**
      * Get file path of the resource
      *

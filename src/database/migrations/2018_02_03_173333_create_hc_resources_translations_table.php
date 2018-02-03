@@ -24,15 +24,15 @@ class CreateHcResourcesTranslationsTable extends Migration
             $table->uuid('record_id');
             $table->uuid('language_code');
 
-            $table->string('title');
+            $table->string('label');
             $table->string('caption')->nullable();
             $table->string('alt_text')->nullable();
             $table->text('description')->nullable();
 
-            $table->foreign('record_id')->references('id')->on('hc_company_category')
+            $table->foreign('record_id')->references('id')->on('hc_resources')
                 ->onUpdate('NO ACTION')->onDelete('NO ACTION');
 
-            $table->foreign('language_code')->references('id')->on('hc_languages')
+            $table->foreign('language_code')->references('iso_639_1')->on('hc_languages')
                 ->onUpdate('NO ACTION')->onDelete('NO ACTION');
         });
     }

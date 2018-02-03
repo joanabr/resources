@@ -11,7 +11,7 @@ return [
     'uploaded_by' => 'Uploaded by',
     'preview' => 'Preview',
     'author' => 'Author',
-    'title' => 'Title',
+    'label' => 'Label',
     'caption' => 'Caption',
     'alt_text' => 'Alt text',
     'description' => 'Description',

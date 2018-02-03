@@ -30,7 +30,7 @@ declare(strict_types = 1);
 namespace HoneyComb\Resources\Http\Controllers\Frontend;
 
 use HoneyComb\Core\Http\Controllers\HCBaseController;
-use HoneyComb\Resources\Http\Request\HCResourceRequest;
+use HoneyComb\Resources\Requests\HCResourceRequest;
 use HoneyComb\Resources\Services\HCResourceService;
 use HoneyComb\Starter\Helpers\HCFrontendResponse;
 use Illuminate\Database\Connection;

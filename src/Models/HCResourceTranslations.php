@@ -33,10 +33,10 @@ use HoneyComb\Starter\Models\HCUuidModel;
 
 
 /**
- * Class HCResourceOwners
+ * Class HCResourceTranslations
  * @package HoneyComb\Resources\Models
  */
-class HCResourceOwners extends HCUuidModel
+class HCResourceTranslations extends HCUuidModel
 {
 
 
@@ -45,7 +45,7 @@ class HCResourceOwners extends HCUuidModel
      *
      * @var string
      */
-    protected $table = 'hc_resource_owners';
+    protected $table = 'hc_resources_translations';
 
     /**
      * The attributes that are mass assignable.
@@ -53,9 +53,13 @@ class HCResourceOwners extends HCUuidModel
      * @var array
      */
     protected $fillable = [
+        "id",
         "record_id",
-        "owner_id",
-        "owner_type",
+        "language_code",
+        "label",
+        "caption",
+        "alt_text",
+        "description",
     ];
 
     /**
