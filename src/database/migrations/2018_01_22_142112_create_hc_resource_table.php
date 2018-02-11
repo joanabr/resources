@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 /**
  * Class CreateHcResourcesTable
  */
-class CreateHcResourcesTable extends Migration
+class CreateHcResourceTable extends Migration
 {
     /**
      * Run the migrations.
@@ -16,7 +16,7 @@ class CreateHcResourcesTable extends Migration
      */
     public function up(): void
     {
-        Schema::create('hc_resources', function (Blueprint $table) {
+        Schema::create('hc_resource', function (Blueprint $table) {
             $table->increments('count');
             $table->uuid('id')->unique();
             $table->datetime('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
@@ -32,7 +32,7 @@ class CreateHcResourcesTable extends Migration
             $table->bigInteger('size');
             $table->string('checksum', 64)->nullable();
 
-            $table->foreign('uploaded_by')->references('id')->on('hc_users')->onUpdate('NO ACTION')->onDelete('NO ACTION');
+            $table->foreign('uploaded_by')->references('id')->on('hc_user')->onUpdate('NO ACTION')->onDelete('NO ACTION');
         });
     }
 
@@ -43,6 +43,6 @@ class CreateHcResourcesTable extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('hc_resources');
+        Schema::dropIfExists('hc_resource');
     }
 }

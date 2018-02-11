@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Repositories;
 
-use HoneyComb\Resources\Models\HCResourceOwners;
+use HoneyComb\Resources\Models\HCResourceOwner;
 use HoneyComb\Core\Repositories\Traits\HCQueryBuilderTrait;
 use HoneyComb\Starter\Repositories\HCBaseRepository;
 
@@ -17,7 +17,7 @@ class HCResourceOwnersRepository extends HCBaseRepository
      */
     public function model(): string
     {
-        return HCResourceOwners::class;
+        return HCResourceOwner::class;
     }
 
     /**
@@ -29,7 +29,7 @@ class HCResourceOwnersRepository extends HCBaseRepository
         $records = $this->makeQuery()->whereIn('id', $ids)->get();
 
         foreach ($records as $record) {
-            /** @var HCResourceOwners $record */
+            /** @var HCResourceOwner $record */
             $record->translations()->delete();
             $record->delete();
         }
@@ -46,7 +46,7 @@ class HCResourceOwnersRepository extends HCBaseRepository
         $records = $this->makeQuery()->withTrashed()->whereIn('id', $ids)->get();
 
         foreach ($records as $record) {
-            /** @var HCResourceOwners $record */
+            /** @var HCResourceOwner $record */
             $record->translations()->restore();
             $record->restore();
         }
@@ -63,7 +63,7 @@ class HCResourceOwnersRepository extends HCBaseRepository
         $records = $this->makeQuery()->withTrashed()->whereIn('id', $ids)->get();
 
         foreach ($records as $record) {
-            /** @var HCResourceOwners $record */
+            /** @var HCResourceOwner $record */
             $record->translations()->forceDelete();
             $record->forceDelete();
         }

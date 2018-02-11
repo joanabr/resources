@@ -27,8 +27,8 @@
     "seeder": "",
     "routes": [
         "Routes\/Frontend\/routes.resources.php",
-        "Routes\/Admin\/routes.resources.php",
-        "Routes\/Admin\/routes.resource.authors.php"
+        "Routes\/Admin\/routes.resource.authors.php",
+        "Routes\/Admin\/routes.resource.php"
     ],
     "acl": {
         "permissions": [

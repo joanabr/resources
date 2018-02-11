@@ -29,23 +29,22 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Models;
 
-use HoneyComb\Starter\Models\HCUuidModel;
+use HoneyComb\Starter\Models\HCModel;
 
 
 /**
- * Class HCResourceTranslations
+ * Class HCResourceTranslation
  * @package HoneyComb\Resources\Models
  */
-class HCResourceTranslations extends HCUuidModel
+class HCResourceTranslation extends HCModel
 {
-
 
     /**
      * The database table used by the model.
      *
      * @var string
      */
-    protected $table = 'hc_resources_translations';
+    protected $table = 'hc_resource_translation';
 
     /**
      * The attributes that are mass assignable.

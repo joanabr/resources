@@ -5,7 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateHcResourceOwnersTable extends Migration
+class CreateHcResourceOwnerTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class CreateHcResourceOwnersTable extends Migration
      */
     public function up(): void
     {
-        Schema::create('hc_resource_owners', function (Blueprint $table) {
+        Schema::create('hc_resource_owner', function (Blueprint $table) {
             $table->increments('count');
             $table->datetime('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->datetime('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
@@ -26,7 +26,7 @@ class CreateHcResourceOwnersTable extends Migration
             $table->index(["owner_id", "owner_type"]);
             $table->unique(['record_id', 'owner_id', 'owner_type']);
 
-            $table->foreign('record_id')->references('id')->on('hc_resources')->onUpdate('NO ACTION')->onDelete('NO ACTION');
+            $table->foreign('record_id')->references('id')->on('hc_resource')->onUpdate('CASCADE')->onDelete('CASCADE');
         });
     }
 
@@ -37,6 +37,6 @@ class CreateHcResourceOwnersTable extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('hc_resource_owners');
+        Schema::dropIfExists('hc_resource_owner');
     }
 }

@@ -45,7 +45,7 @@ class HCResourceAuthor extends HCUuidModel
      *
      * @var string
      */
-    protected $table = 'hc_resources_author';
+    protected $table = 'hc_resource_author';
 
     /**
      * The attributes that are mass assignable.

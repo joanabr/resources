@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddAuthorFieldToHcResourcesTable extends Migration
+class AddAuthorFieldToHcResourceTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class AddAuthorFieldToHcResourcesTable extends Migration
      */
     public function up()
     {
-        Schema::table('hc_resources', function(Blueprint $table) {
+        Schema::table('hc_resource', function(Blueprint $table) {
 
             $table->uuid('author_id')->nullable();
 
-            $table->foreign('author_id')->references('id')->on('hc_resources_author')
+            $table->foreign('author_id')->references('id')->on('hc_resource_author')
                 ->onUpdate('NO ACTION')
                 ->onDelete('NO ACTION');
 
@@ -31,7 +31,7 @@ class AddAuthorFieldToHcResourcesTable extends Migration
      */
     public function down()
     {
-        Schema::table('hc_resources', function (Blueprint $table) {
+        Schema::table('hc_resource', function (Blueprint $table) {
             $table->dropForeign(['author_id']);
             $table->dropColumn('author_id');
         });

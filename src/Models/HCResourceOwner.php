@@ -36,7 +36,7 @@ use HoneyComb\Starter\Models\HCUuidModel;
  * Class HCResourceOwners
  * @package HoneyComb\Resources\Models
  */
-class HCResourceOwners extends HCUuidModel
+class HCResourceOwner extends HCUuidModel
 {
 
 
@@ -45,7 +45,7 @@ class HCResourceOwners extends HCUuidModel
      *
      * @var string
      */
-    protected $table = 'hc_resource_owners';
+    protected $table = 'hc_resource_owner';
 
     /**
      * The attributes that are mass assignable.
