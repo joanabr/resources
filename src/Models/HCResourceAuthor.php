@@ -31,15 +31,12 @@ namespace HoneyComb\Resources\Models;
 
 use HoneyComb\Starter\Models\HCUuidModel;
 
-
 /**
  * Class HCResourceAuthor
  * @package HoneyComb\Resources\Models
  */
 class HCResourceAuthor extends HCUuidModel
 {
-
-
     /**
      * The database table used by the model.
      *
@@ -56,5 +53,4 @@ class HCResourceAuthor extends HCUuidModel
         "id",
         "name",
     ];
-
 }

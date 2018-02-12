@@ -8,6 +8,9 @@ use HoneyComb\Resources\Models\HCResourceOwner;
 use HoneyComb\Core\Repositories\Traits\HCQueryBuilderTrait;
 use HoneyComb\Starter\Repositories\HCBaseRepository;
 
+/**
+ * Class HCResourceOwnersRepository.
+ */
 class HCResourceOwnersRepository extends HCBaseRepository
 {
     use HCQueryBuilderTrait;
@@ -57,6 +60,7 @@ class HCResourceOwnersRepository extends HCBaseRepository
      *
      * @param array $ids
      * @return void
+     * @throws \Exception
      */
     public function deleteForce(array $ids): void
     {

@@ -20,7 +20,6 @@ class AddAuthorFieldToHcResourceTable extends Migration
             $table->foreign('author_id')->references('id')->on('hc_resource_author')
                 ->onUpdate('NO ACTION')
                 ->onDelete('NO ACTION');
-
         });
     }
 

@@ -29,16 +29,14 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Models;
 
-use HoneyComb\Starter\Models\HCModel;
-
+use HoneyComb\Starter\Models\HCUuidModel;
 
 /**
  * Class HCResourceTranslation
  * @package HoneyComb\Resources\Models
  */
-class HCResourceTranslation extends HCModel
+class HCResourceTranslation extends HCUuidModel
 {
-
     /**
      * The database table used by the model.
      *
@@ -64,8 +62,5 @@ class HCResourceTranslation extends HCModel
     /**
      * @var array
      */
-    protected $with = [
-
-    ];
-
+    protected $with = [];
 }

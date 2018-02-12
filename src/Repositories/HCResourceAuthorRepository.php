@@ -8,6 +8,9 @@ use HoneyComb\Resources\Models\HCResourceAuthor;
 use HoneyComb\Core\Repositories\Traits\HCQueryBuilderTrait;
 use HoneyComb\Starter\Repositories\HCBaseRepository;
 
+/**
+ * Class HCResourceAuthorRepository.
+ */
 class HCResourceAuthorRepository extends HCBaseRepository
 {
     use HCQueryBuilderTrait;
@@ -23,6 +26,7 @@ class HCResourceAuthorRepository extends HCBaseRepository
     /**
      * Soft deleting records
      * @param $ids
+     * @throws \Exception
      */
     public function deleteSoft(array $ids): void
     {
@@ -55,6 +59,7 @@ class HCResourceAuthorRepository extends HCBaseRepository
      *
      * @param array $ids
      * @return void
+     * @throws \Exception
      */
     public function deleteForce(array $ids): void
     {

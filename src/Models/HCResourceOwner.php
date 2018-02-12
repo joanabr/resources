@@ -31,15 +31,12 @@ namespace HoneyComb\Resources\Models;
 
 use HoneyComb\Starter\Models\HCUuidModel;
 
-
 /**
  * Class HCResourceOwners
  * @package HoneyComb\Resources\Models
  */
 class HCResourceOwner extends HCUuidModel
 {
-
-
     /**
      * The database table used by the model.
      *
@@ -61,8 +58,5 @@ class HCResourceOwner extends HCUuidModel
     /**
      * @var array
      */
-    protected $with = [
-
-    ];
-
+    protected $with = [];
 }

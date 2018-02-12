@@ -112,6 +112,7 @@ class HCResourceRepository extends HCBaseRepository
      *
      * @param array $ids
      * @return void
+     * @throws \Exception
      */
     public function deleteForce(array $ids): void
     {
