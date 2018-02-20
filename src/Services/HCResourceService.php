@@ -382,7 +382,10 @@ class HCResourceService
         $explodedByParams = explode('?', $fileName);
         $fileName = head($explodedByParams);
 
-        return sanitizeString(pathinfo($fileName, PATHINFO_FILENAME)) . '.' . pathinfo($fileName, PATHINFO_EXTENSION);
+        if (strpos($fileName, '.') !== false)
+            return sanitizeString(pathinfo($fileName, PATHINFO_FILENAME)) . '.' . pathinfo($fileName, PATHINFO_EXTENSION);
+        else
+            return sanitizeString(pathinfo($fileName, PATHINFO_FILENAME));
     }
 
     /**
