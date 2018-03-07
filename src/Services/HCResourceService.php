@@ -251,7 +251,7 @@ class HCResourceService
 
         $fileName = $this->getFileName($source);
 
-        if ($fileName && $fileName != '') {
+        if (strlen($fileName)) {
 
             $destination = storage_path('app/uploads/tmp/' . $fileName);
 
