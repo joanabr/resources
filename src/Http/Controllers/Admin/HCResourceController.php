@@ -30,9 +30,8 @@ declare(strict_types = 1);
 namespace HoneyComb\Resources\Http\Controllers\Admin;
 
 use HoneyComb\Resources\Services\HCResourceService;
-use HoneyComb\Resources\Requests\HCResourceRequest;
+use HoneyComb\Resources\Requests\Admin\HCResourceRequest;
 use HoneyComb\Resources\Models\HCResource;
-
 use HoneyComb\Core\Http\Controllers\HCBaseController;
 use HoneyComb\Core\Http\Controllers\Traits\HCAdminListHeaders;
 use HoneyComb\Starter\Helpers\HCFrontendResponse;
@@ -40,6 +39,10 @@ use Illuminate\Database\Connection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 
+/**
+ * Class HCResourceController
+ * @package HoneyComb\Resources\Http\Controllers\Admin
+ */
 class HCResourceController extends HCBaseController
 {
     use HCAdminListHeaders;
