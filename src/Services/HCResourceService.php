@@ -33,13 +33,12 @@ use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
 use File;
 use HoneyComb\Resources\Models\HCResource;
-use HoneyComb\Resources\Repositories\HCResourceRepository;
+use HoneyComb\Resources\Repositories\Admin\HCResourceRepository;
 use Illuminate\Http\UploadedFile;
 use Image;
 use Intervention\Image\Constraint;
 use Ramsey\Uuid\Uuid;
 use Storage;
-
 
 /**
  * Class HCResourceService

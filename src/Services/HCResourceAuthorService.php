@@ -29,7 +29,8 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Services;
 
-use HoneyComb\Resources\Repositories\HCResourceAuthorRepository;
+use HoneyComb\Resources\Repositories\Admin\HCResourceAuthorRepository;
+
 
 class HCResourceAuthorService
 {

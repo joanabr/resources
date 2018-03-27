@@ -40,6 +40,10 @@ use Illuminate\Database\Connection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 
+/**
+ * Class HCResourceAuthorController
+ * @package HoneyComb\Resources\Http\Controllers\Admin
+ */
 class HCResourceAuthorController extends HCBaseController
 {
     use HCAdminListHeaders;
@@ -106,7 +110,7 @@ class HCResourceAuthorController extends HCBaseController
 
     /**
      * @param string $id
-     * @return \HoneyComb\Resources\Models\HCResourceAuthor|\HoneyComb\Resources\Repositories\HCResourceAuthorRepository|\Illuminate\Database\Eloquent\Model|null
+     * @return \HoneyComb\Resources\Models\HCResourceAuthor|\HoneyComb\Resources\Repositories\Admin\HCResourceAuthorRepository|\Illuminate\Database\Eloquent\Model|null
      */
     public function getById(string $id)
     {

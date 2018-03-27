@@ -29,7 +29,7 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Providers;
 
-use HoneyComb\Resources\Repositories\HCResourceRepository;
+use HoneyComb\Resources\Repositories\Admin\HCResourceRepository;
 use HoneyComb\Resources\Services\HCResourceService;
 use HoneyComb\Starter\Providers\HCBaseServiceProvider;
 

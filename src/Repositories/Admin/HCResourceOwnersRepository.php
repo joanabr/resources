@@ -27,18 +27,17 @@
 
 declare(strict_types = 1);
 
-namespace HoneyComb\Resources\Repositories;
+namespace HoneyComb\Resources\Repositories\Admin;
 
-use HoneyComb\Resources\Models\HCResource;
+use HoneyComb\Resources\Models\HCResourceOwner;
 use HoneyComb\Core\Repositories\Traits\HCQueryBuilderTrait;
 use HoneyComb\Starter\Repositories\HCBaseRepository;
-use Illuminate\Http\UploadedFile;
 
 /**
- * Class HCResourceRepository
- * @package HoneyComb\Resources\Repositories
+ * Class HCResourceOwnersRepository
+ * @package HoneyComb\Resources\Repositories\Admin
  */
-class HCResourceRepository extends HCBaseRepository
+class HCResourceOwnersRepository extends HCBaseRepository
 {
     use HCQueryBuilderTrait;
 
@@ -47,32 +46,7 @@ class HCResourceRepository extends HCBaseRepository
      */
     public function model(): string
     {
-        return HCResource::class;
-    }
-
-    /**
-     * Get file params
-     *
-     * @param $file
-     * @return array
-     */
-    public function getFileParams(UploadedFile $file)
-    {
-        $params = [];
-
-        if ($this->resourceID) {
-            $params['id'] = $this->resourceID;
-        } else {
-            $params['id'] = Uuid::uuid4()->toString();
-        }
-
-        $params['original_name'] = $file->getClientOriginalName();
-        $params['extension'] = '.' . $file->getClientOriginalExtension();
-        $params['path'] = $this->uploadPath . $params['id'] . $params['extension'];
-        $params['size'] = $file->getClientSize();
-        $params['mime_type'] = $file->getClientMimeType();
-
-        return $params;
+        return HCResourceOwner::class;
     }
 
     /**
@@ -84,7 +58,7 @@ class HCResourceRepository extends HCBaseRepository
         $records = $this->makeQuery()->whereIn('id', $ids)->get();
 
         foreach ($records as $record) {
-            /** @var HCResource $record */
+            /** @var HCResourceOwner $record */
             $record->translations()->delete();
             $record->delete();
         }
@@ -101,7 +75,7 @@ class HCResourceRepository extends HCBaseRepository
         $records = $this->makeQuery()->withTrashed()->whereIn('id', $ids)->get();
 
         foreach ($records as $record) {
-            /** @var HCResource $record */
+            /** @var HCResourceOwner $record */
             $record->translations()->restore();
             $record->restore();
         }
@@ -119,7 +93,7 @@ class HCResourceRepository extends HCBaseRepository
         $records = $this->makeQuery()->withTrashed()->whereIn('id', $ids)->get();
 
         foreach ($records as $record) {
-            /** @var HCResource $record */
+            /** @var HCResourceOwner $record */
             $record->translations()->forceDelete();
             $record->forceDelete();
         }

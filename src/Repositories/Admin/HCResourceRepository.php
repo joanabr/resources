@@ -27,16 +27,18 @@
 
 declare(strict_types = 1);
 
-namespace HoneyComb\Resources\Repositories;
+namespace HoneyComb\Resources\Repositories\Admin;
 
-use HoneyComb\Resources\Models\HCResourceAuthor;
+use HoneyComb\Resources\Models\HCResource;
 use HoneyComb\Core\Repositories\Traits\HCQueryBuilderTrait;
 use HoneyComb\Starter\Repositories\HCBaseRepository;
+use Illuminate\Http\UploadedFile;
 
 /**
- * Class HCResourceAuthorRepository.
+ * Class HCResourceRepository
+ * @package HoneyComb\Resources\Repositories\Admin
  */
-class HCResourceAuthorRepository extends HCBaseRepository
+class HCResourceRepository extends HCBaseRepository
 {
     use HCQueryBuilderTrait;
 
@@ -45,20 +47,45 @@ class HCResourceAuthorRepository extends HCBaseRepository
      */
     public function model(): string
     {
-        return HCResourceAuthor::class;
+        return HCResource::class;
+    }
+
+    /**
+     * Get file params
+     *
+     * @param $file
+     * @return array
+     */
+    public function getFileParams(UploadedFile $file)
+    {
+        $params = [];
+
+        if ($this->resourceID) {
+            $params['id'] = $this->resourceID;
+        } else {
+            $params['id'] = Uuid::uuid4()->toString();
+        }
+
+        $params['original_name'] = $file->getClientOriginalName();
+        $params['extension'] = '.' . $file->getClientOriginalExtension();
+        $params['path'] = $this->uploadPath . $params['id'] . $params['extension'];
+        $params['size'] = $file->getClientSize();
+        $params['mime_type'] = $file->getClientMimeType();
+
+        return $params;
     }
 
     /**
      * Soft deleting records
      * @param $ids
-     * @throws \Exception
      */
     public function deleteSoft(array $ids): void
     {
         $records = $this->makeQuery()->whereIn('id', $ids)->get();
 
         foreach ($records as $record) {
-            /** @var HCResourceAuthor $record */
+            /** @var HCResource $record */
+            $record->translations()->delete();
             $record->delete();
         }
     }
@@ -74,7 +101,8 @@ class HCResourceAuthorRepository extends HCBaseRepository
         $records = $this->makeQuery()->withTrashed()->whereIn('id', $ids)->get();
 
         foreach ($records as $record) {
-            /** @var HCResourceAuthor $record */
+            /** @var HCResource $record */
+            $record->translations()->restore();
             $record->restore();
         }
     }
@@ -91,7 +119,8 @@ class HCResourceAuthorRepository extends HCBaseRepository
         $records = $this->makeQuery()->withTrashed()->whereIn('id', $ids)->get();
 
         foreach ($records as $record) {
-            /** @var HCResourceAuthor $record */
+            /** @var HCResource $record */
+            $record->translations()->forceDelete();
             $record->forceDelete();
         }
     }

@@ -27,16 +27,17 @@
 
 declare(strict_types = 1);
 
-namespace HoneyComb\Resources\Repositories;
+namespace HoneyComb\Resources\Repositories\Admin;
 
-use HoneyComb\Resources\Models\HCResourceOwner;
+use HoneyComb\Resources\Models\HCResourceAuthor;
 use HoneyComb\Core\Repositories\Traits\HCQueryBuilderTrait;
 use HoneyComb\Starter\Repositories\HCBaseRepository;
 
 /**
- * Class HCResourceOwnersRepository.
+ * Class HCResourceAuthorRepository
+ * @package HoneyComb\Resources\Repositories\Admin
  */
-class HCResourceOwnersRepository extends HCBaseRepository
+class HCResourceAuthorRepository extends HCBaseRepository
 {
     use HCQueryBuilderTrait;
 
@@ -45,20 +46,20 @@ class HCResourceOwnersRepository extends HCBaseRepository
      */
     public function model(): string
     {
-        return HCResourceOwner::class;
+        return HCResourceAuthor::class;
     }
 
     /**
      * Soft deleting records
      * @param $ids
+     * @throws \Exception
      */
     public function deleteSoft(array $ids): void
     {
         $records = $this->makeQuery()->whereIn('id', $ids)->get();
 
         foreach ($records as $record) {
-            /** @var HCResourceOwner $record */
-            $record->translations()->delete();
+            /** @var HCResourceAuthor $record */
             $record->delete();
         }
     }
@@ -74,8 +75,7 @@ class HCResourceOwnersRepository extends HCBaseRepository
         $records = $this->makeQuery()->withTrashed()->whereIn('id', $ids)->get();
 
         foreach ($records as $record) {
-            /** @var HCResourceOwner $record */
-            $record->translations()->restore();
+            /** @var HCResourceAuthor $record */
             $record->restore();
         }
     }
@@ -92,8 +92,7 @@ class HCResourceOwnersRepository extends HCBaseRepository
         $records = $this->makeQuery()->withTrashed()->whereIn('id', $ids)->get();
 
         foreach ($records as $record) {
-            /** @var HCResourceOwner $record */
-            $record->translations()->forceDelete();
+            /** @var HCResourceAuthor $record */
             $record->forceDelete();
         }
     }

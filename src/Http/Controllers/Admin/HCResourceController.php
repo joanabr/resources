@@ -113,7 +113,7 @@ class HCResourceController extends HCBaseController
 
     /**
      * @param string $id
-     * @return \HoneyComb\Resources\Models\HCResource|\HoneyComb\Resources\Repositories\HCResourceRepository|\Illuminate\Database\Eloquent\Model|null
+     * @return \HoneyComb\Resources\Models\HCResource|\HoneyComb\Resources\Repositories\Admin\HCResourceRepository|\Illuminate\Database\Eloquent\Model|null
      */
     public function getById(string $id)
     {
