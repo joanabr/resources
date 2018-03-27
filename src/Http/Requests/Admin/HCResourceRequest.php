@@ -27,11 +27,15 @@
 
 declare(strict_types = 1);
 
-namespace HoneyComb\Resources\Requests;
+namespace HoneyComb\Resources\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class HCResourceAuthorRequest extends FormRequest
+/**
+ * Class HCResourceRequest
+ * @package HoneyComb\Resources\Requests\Admin
+ */
+class HCResourceRequest extends FormRequest
 {
     /**
      * Get request inputs
@@ -41,6 +45,16 @@ class HCResourceAuthorRequest extends FormRequest
     public function getRecordData(): array
     {
         return request()->all();
+    }
+
+    /**
+     * Get resource file
+     *
+     * @return \Illuminate\Http\UploadedFile|array|null
+     */
+    public function getFile()
+    {
+        return $this->file('file');
     }
 
     /**
@@ -89,13 +103,13 @@ class HCResourceAuthorRequest extends FormRequest
                 }
 
                 return [
-                    'name' => 'required|min:2',
+                    'file' => 'required',
                 ];
 
             case 'PUT':
 
                 return [
-                    'name' => 'required|min:2',
+                    'translations' => 'required|array|min:1',
                 ];
 
             case 'DELETE':

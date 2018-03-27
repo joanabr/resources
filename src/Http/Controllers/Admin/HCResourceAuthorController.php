@@ -30,7 +30,7 @@ declare(strict_types = 1);
 namespace HoneyComb\Resources\Http\Controllers\Admin;
 
 use HoneyComb\Resources\Services\HCResourceAuthorService;
-use HoneyComb\Resources\Requests\HCResourceAuthorRequest;
+use HoneyComb\Resources\Requests\Admin\HCResourceAuthorRequest;
 use HoneyComb\Resources\Models\HCResourceAuthor;
 
 use HoneyComb\Core\Http\Controllers\HCBaseController;
