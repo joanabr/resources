@@ -31,6 +31,10 @@ namespace HoneyComb\Resources\database\seeds;
 
 use Illuminate\Database\Seeder;
 
+/**
+ * Class HCResourceSeeder
+ * @package HoneyComb\Resources\database\seeds
+ */
 class HCResourceSeeder extends Seeder
 {
     /**

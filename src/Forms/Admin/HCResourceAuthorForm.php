@@ -33,7 +33,7 @@ use HoneyComb\Starter\Forms\HCBaseForm;
 
 /**
  * Class HCResourceAuthorForm
- * @package HoneyComb\Resources\Forms
+ * @package HoneyComb\Resources\Forms\Admin
  */
 class HCResourceAuthorForm extends HCBaseForm
 {

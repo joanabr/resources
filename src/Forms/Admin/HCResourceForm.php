@@ -32,8 +32,8 @@ namespace HoneyComb\Resources\Forms\Admin;
 use HoneyComb\Starter\Forms\HCBaseForm;
 
 /**
- * Class HCResourceAuthorForm
- * @package HoneyComb\Resources\Forms
+ * Class HCResourceForm
+ * @package HoneyComb\Resources\Forms\Admin
  */
 class HCResourceForm extends HCBaseForm
 {
