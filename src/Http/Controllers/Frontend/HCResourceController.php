@@ -29,6 +29,7 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Http\Controllers\Frontend;
 
+use HoneyComb\Resources\Http\Events\Frontend\HCResourceCreated;
 use HoneyComb\Core\Http\Controllers\HCBaseController;
 use HoneyComb\Resources\Requests\Admin\HCResourceRequest;
 use HoneyComb\Resources\Services\HCResourceService;
@@ -104,6 +105,8 @@ class HCResourceController extends HCBaseController
 
             return $this->response->error($exception->getMessage());
         }
+
+        event(new HCResourceCreated($record));
 
         return $this->response->success('Uploaded', $record);
     }

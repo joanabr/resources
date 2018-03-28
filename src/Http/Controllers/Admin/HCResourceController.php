@@ -29,6 +29,11 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Http\Controllers\Admin;
 
+use HoneyComb\Resources\Http\Events\Admin\HCResourceCreated;
+use HoneyComb\Resources\Http\Events\Admin\HCResourceUpdated;
+use HoneyComb\Resources\Http\Events\Admin\HCResourceRestored;
+use HoneyComb\Resources\Http\Events\Admin\HCResourceSoftDeleted;
+use HoneyComb\Resources\Http\Events\Admin\HCResourceForceDeleted;
 use HoneyComb\Resources\Services\HCResourceService;
 use HoneyComb\Resources\Requests\Admin\HCResourceRequest;
 use HoneyComb\Resources\Models\HCResource;
@@ -153,6 +158,8 @@ class HCResourceController extends HCBaseController
             return $this->response->error($e->getMessage());
         }
 
+        event(new HCResourceCreated($model));
+
         return $this->response->success("Created");
     }
 
@@ -169,6 +176,8 @@ class HCResourceController extends HCBaseController
         $model->update($request->getRecordData());
         $model->updateTranslations($request->getTranslations());
 
+        event(new HCResourceUpdated($model));
+
         return $this->response->success("Created");
     }
 
@@ -182,7 +191,7 @@ class HCResourceController extends HCBaseController
         $this->connection->beginTransaction();
 
         try {
-            $this->service->getRepository()->deleteSoft($request->getListIds());
+            $deletedIds = $this->service->getRepository()->deleteSoft($request->getListIds());
 
             $this->connection->commit();
         } catch (\Exception $exception) {
@@ -190,6 +199,8 @@ class HCResourceController extends HCBaseController
 
             return $this->response->error($exception->getMessage());
         }
+
+        event(new HCResourceSoftDeleted($deletedIds));
 
         return $this->response->success('Successfully deleted');
     }
@@ -204,7 +215,7 @@ class HCResourceController extends HCBaseController
         $this->connection->beginTransaction();
 
         try {
-            $this->service->getRepository()->restore($request->getListIds());
+            $restoredIds = $this->service->getRepository()->restore($request->getListIds());
 
             $this->connection->commit();
         } catch (\Exception $exception) {
@@ -212,6 +223,8 @@ class HCResourceController extends HCBaseController
 
             return $this->response->error($exception->getMessage());
         }
+
+        event(new HCResourceRestored($restoredIds));
 
         return $this->response->success('Successfully restored');
     }
@@ -226,7 +239,7 @@ class HCResourceController extends HCBaseController
         $this->connection->beginTransaction();
 
         try {
-            $this->service->getRepository()->deleteForce($request->getListIds());
+            $deletedIds = $this->service->getRepository()->deleteForce($request->getListIds());
 
             $this->connection->commit();
         } catch (\Exception $exception) {
@@ -234,6 +247,8 @@ class HCResourceController extends HCBaseController
 
             return $this->response->error($exception->getMessage());
         }
+
+        event(new HCResourceForceDeleted($deletedIds));
 
         return $this->response->success('Successfully deleted');
     }
