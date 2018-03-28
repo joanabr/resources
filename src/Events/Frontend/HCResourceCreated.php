@@ -25,6 +25,8 @@
  * http://www.interactivesolutions.lt
  */
 
+declare(strict_types = 1);
+
 namespace HoneyComb\Resources\Http\Events\Frontend;
 
 use Illuminate\Broadcasting\Channel;
@@ -35,11 +37,16 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
+/**
+ * Class HCResourceCreated
+ * @package HoneyComb\Resources\Http\Events\Frontend
+ */
 class HCResourceCreated
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $record;
+
     /**
      * Create a new event instance.
      *

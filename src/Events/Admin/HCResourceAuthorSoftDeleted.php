@@ -25,6 +25,8 @@
  * http://www.interactivesolutions.lt
  */
 
+declare(strict_types = 1);
+
 namespace HoneyComb\Resources\Http\Events\Admin;
 
 use Illuminate\Broadcasting\Channel;
@@ -35,11 +37,16 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
+/**
+ * Class HCResourceAuthorSoftDeleted
+ * @package HoneyComb\Resources\Http\Events\Admin
+ */
 class HCResourceAuthorSoftDeleted
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $deletedIds;
+
     /**
      * Create a new event instance.
      *

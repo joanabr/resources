@@ -25,6 +25,8 @@
  * http://www.interactivesolutions.lt
  */
 
+declare(strict_types = 1);
+
 namespace HoneyComb\Resources\Http\Events\Admin;
 
 use Illuminate\Broadcasting\Channel;
@@ -35,11 +37,16 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
+/**
+ * Class HCResourceAuthorRestored
+ * @package HoneyComb\Resources\Http\Events\Admin
+ */
 class HCResourceAuthorRestored
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $restoredIds;
+
     /**
      * Create a new event instance.
      *
