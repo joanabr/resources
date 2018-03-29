@@ -56,24 +56,24 @@ class HCResourceService
      *
      * @var string
      */
-    private $uploadPath;
+    protected $uploadPath;
 
     /**
      * If uploaded file has predefined ID it will be used
      *
      * @var
      */
-    private $resourceId;
+    protected $resourceId;
 
     /**
      * @var bool
      */
-    private $allowDuplicates;
+    protected $allowDuplicates;
 
     /**
      * @var HCResourceRepository
      */
-    private $repository;
+    protected $repository;
 
     /**
      * HCResourceService constructor.
