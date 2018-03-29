@@ -29,11 +29,11 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Http\Controllers\Admin;
 
-use HoneyComb\Resources\Http\Events\Admin\HCResourceAuthorForceDeleted;
-use HoneyComb\Resources\Http\Events\Admin\HCResourceAuthorRestored;
-use HoneyComb\Resources\Http\Events\Admin\HCResourceAuthorSoftDeleted;
-use HoneyComb\Resources\Http\Events\Admin\HCResourceAuthorCreated;
-use HoneyComb\Resources\Http\Events\Admin\HCResourceAuthorUpdated;
+use HoneyComb\Resources\Events\Admin\ResourceAuthor\HCResourceAuthorForceDeleted;
+use HoneyComb\Resources\Events\Admin\ResourceAuthor\HCResourceAuthorRestored;
+use HoneyComb\Resources\Events\Admin\ResourceAuthor\HCResourceAuthorSoftDeleted;
+use HoneyComb\Resources\Events\Admin\ResourceAuthor\HCResourceAuthorCreated;
+use HoneyComb\Resources\Events\Admin\ResourceAuthor\HCResourceAuthorUpdated;
 use HoneyComb\Resources\Services\HCResourceAuthorService;
 use HoneyComb\Resources\Requests\Admin\HCResourceAuthorRequest;
 use HoneyComb\Resources\Models\HCResourceAuthor;
@@ -61,12 +61,12 @@ class HCResourceAuthorController extends HCBaseController
     /**
      * @var Connection
      */
-    private $connection;
+    protected $connection;
 
     /**
      * @var HCFrontendResponse
      */
-    private $response;
+    protected $response;
 
     /**
      * HCResourceAuthorController constructor.
@@ -168,10 +168,14 @@ class HCResourceAuthorController extends HCBaseController
      */
     public function update(HCResourceAuthorRequest $request, string $id): JsonResponse
     {
-        $model = $this->service->getRepository()->findOneBy(['id' => $id]);
-        $model->update($request->getRecordData());
+        $record = $this->service->getRepository()->findOneBy(['id' => $id]);
+        $record->update($request->getRecordData());
 
-        event(new HCResourceAuthorUpdated($model));
+        if ($record) {
+            $record = $this->service->getRepository()->find($id);
+
+            event(new HCResourceAuthorUpdated($record));
+        }
 
         return $this->response->success("Created");
     }
@@ -186,7 +190,7 @@ class HCResourceAuthorController extends HCBaseController
         $this->connection->beginTransaction();
 
         try {
-            $deletedIds = $this->service->getRepository()->deleteSoft($request->getListIds());
+            $deleted = $this->service->getRepository()->deleteSoft($request->getListIds());
 
             $this->connection->commit();
         } catch (\Exception $exception) {
@@ -195,7 +199,7 @@ class HCResourceAuthorController extends HCBaseController
             return $this->response->error($exception->getMessage());
         }
 
-        event(new HCResourceAuthorSoftDeleted($deletedIds));
+        event(new HCResourceAuthorSoftDeleted($deleted));
 
         return $this->response->success('Successfully deleted');
     }
@@ -210,7 +214,7 @@ class HCResourceAuthorController extends HCBaseController
         $this->connection->beginTransaction();
 
         try {
-            $restoredIds = $this->service->getRepository()->restore($request->getListIds());
+            $restored = $this->service->getRepository()->restore($request->getListIds());
 
             $this->connection->commit();
         } catch (\Exception $exception) {
@@ -219,7 +223,7 @@ class HCResourceAuthorController extends HCBaseController
             return $this->response->error($exception->getMessage());
         }
 
-        event(new HCResourceAuthorRestored($restoredIds));
+        event(new HCResourceAuthorRestored($restored));
 
         return $this->response->success('Successfully restored');
     }
@@ -234,7 +238,7 @@ class HCResourceAuthorController extends HCBaseController
         $this->connection->beginTransaction();
 
         try {
-            $deletedIds = $this->service->getRepository()->deleteForce($request->getListIds());
+            $deleted = $this->service->getRepository()->deleteForce($request->getListIds());
 
             $this->connection->commit();
         } catch (\Exception $exception) {
@@ -243,7 +247,7 @@ class HCResourceAuthorController extends HCBaseController
             return $this->response->error($exception->getMessage());
         }
 
-        event(new HCResourceAuthorForceDeleted($deletedIds));
+        event(new HCResourceAuthorForceDeleted($deleted));
 
         return $this->response->success('Successfully deleted');
     }

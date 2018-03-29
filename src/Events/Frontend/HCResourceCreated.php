@@ -45,6 +45,9 @@ class HCResourceCreated
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    /**
+     * @var
+     */
     public $record;
 
     /**

@@ -86,7 +86,7 @@ class HCResourceAuthorRequest extends FormRequest
     {
         switch ($this->method()) {
             case 'POST':
-                if ($this->segment(4) == 'restore') {
+                if ($this->segment(5) == 'restore') {
                     return [
                         'list' => 'required|array',
                     ];

@@ -54,46 +54,61 @@ class HCResourceAuthorRepository extends HCBaseRepository
      * @param $ids
      * @throws \Exception
      */
-    public function deleteSoft(array $ids): void
+    public function deleteSoft(array $ids): array
     {
+        $deleted = [];
+
         $records = $this->makeQuery()->whereIn('id', $ids)->get();
 
+        /** @var HCResourceAuthor $record */
         foreach ($records as $record) {
-            /** @var HCResourceAuthor $record */
-            $record->delete();
+
+            if ($record->delete()) {
+                $deleted[] = $record;
+            }
+
         }
+
+        return $deleted;
     }
 
     /**
-     * Restore soft deleted records
-     *
      * @param array $ids
-     * @return void
+     * @return array
      */
-    public function restore(array $ids): void
+    public function restore(array $ids): array
     {
+        $restored = [];
+
         $records = $this->makeQuery()->withTrashed()->whereIn('id', $ids)->get();
 
         foreach ($records as $record) {
             /** @var HCResourceAuthor $record */
-            $record->restore();
+            if ($record->restore()) {
+                $restored[] = $record;
+            }
         }
+
+        return $restored;
     }
 
     /**
-     * Force delete records by given id
-     *
      * @param array $ids
-     * @return void
-     * @throws \Exception
+     * @return array
      */
-    public function deleteForce(array $ids): void
+    public function deleteForce(array $ids): array
     {
+        $deleted = [];
+
         $records = $this->makeQuery()->withTrashed()->whereIn('id', $ids)->get();
 
         foreach ($records as $record) {
             /** @var HCResourceAuthor $record */
-            $record->forceDelete();
+            if($record->forceDelete()) {
+                $deleted[] = $record;
+            }
         }
+
+        return $deleted;
     }
 }

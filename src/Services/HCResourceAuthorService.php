@@ -37,7 +37,7 @@ class HCResourceAuthorService
     /**
      * @var HCResourceAuthorRepository
      */
-    private $repository;
+    protected $repository;
 
     /**
      * HCResourceAuthorService constructor.

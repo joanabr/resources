@@ -25,9 +25,7 @@
  * http://www.interactivesolutions.lt
  */
 
-declare(strict_types = 1);
-
-namespace HoneyComb\Resources\Http\Events\Admin;
+namespace HoneyComb\Resources\Events\Admin\ResourceAuthor;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
@@ -38,23 +36,23 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 /**
- * Class HCResourceUpdated
+ * Class HCResourceAuthorSoftDeleted
  * @package HoneyComb\Resources\Http\Events\Admin
  */
-class HCResourceUpdated
+class HCResourceAuthorSoftDeleted
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $model;
+    public $deletedIds;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($model)
+    public function __construct($deletedIds)
     {
-        $this->model = $model;
+        $this->deletedIds = $deletedIds;
     }
 
     /**

@@ -25,9 +25,7 @@
  * http://www.interactivesolutions.lt
  */
 
-declare(strict_types = 1);
-
-namespace HoneyComb\Resources\Http\Events\Admin;
+namespace HoneyComb\Resources\Events\Admin\ResourceAuthor;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
@@ -38,23 +36,23 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 /**
- * Class HCResourceAuthorCreated
+ * Class HCResourceAuthorUpdated
  * @package HoneyComb\Resources\Http\Events\Admin
  */
-class HCResourceAuthorCreated
+class HCResourceAuthorUpdated
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $resourceAuthor;
+    public $record;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($resourceAuthor)
+    public function __construct($record)
     {
-        $this->resourceAuthor = $resourceAuthor;
+        $this->record = $record;
     }
 
     /**

@@ -25,9 +25,7 @@
  * http://www.interactivesolutions.lt
  */
 
-declare(strict_types = 1);
-
-namespace HoneyComb\Resources\Http\Events\Admin;
+namespace HoneyComb\Resources\Events\Admin\ResourceAuthor;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
@@ -38,10 +36,10 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 /**
- * Class HCResourceAuthorSoftDeleted
+ * Class HCResourceAuthorForceDeleted
  * @package HoneyComb\Resources\Http\Events\Admin
  */
-class HCResourceAuthorSoftDeleted
+class HCResourceAuthorForceDeleted
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 

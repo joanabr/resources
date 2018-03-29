@@ -36,13 +36,11 @@ Route::prefix(config('hc.admin_url'))
             ->name('admin.resource.index')
             ->middleware('acl:honey_comb_resources_resource_admin_list');
 
-
         Route::prefix('api/resource')->group(function() {
 
             Route::get('/', 'HCResourceController@getListPaginate')
                 ->name('admin.api.resource')
                 ->middleware('acl:honey_comb_resources_resource_admin_list');
-
 
             Route::get('list', 'HCResourceController@getList')
                 ->name('admin.api.resource.list')
