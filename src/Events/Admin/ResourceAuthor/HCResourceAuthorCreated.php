@@ -27,6 +27,7 @@
 
 namespace HoneyComb\Resources\Events\Admin\ResourceAuthor;
 
+use HoneyComb\Resources\Models\HCResourceAuthor;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -43,6 +44,9 @@ class HCResourceAuthorCreated
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    /**
+     * @var HCResourceAuthor
+     */
     public $resourceAuthor;
 
     /**
@@ -50,7 +54,7 @@ class HCResourceAuthorCreated
      *
      * @return void
      */
-    public function __construct($resourceAuthor)
+    public function __construct(HCResourceAuthor $resourceAuthor)
     {
         $this->resourceAuthor = $resourceAuthor;
     }

@@ -138,6 +138,18 @@ class HCResourceController extends HCBaseController
     }
 
     /**
+     * Create data list
+     * @param HCResourceRequest $request
+     * @return JsonResponse
+     */
+    public function getOptions(HCResourceRequest $request): JsonResponse
+    {
+        return response()->json(
+            $this->service->getRepository()->getOptions($request)
+        );
+    }
+
+    /**
      * @param HCResourceRequest $request
      * @return JsonResponse
      * @throws \Exception

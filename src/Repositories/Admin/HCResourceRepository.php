@@ -31,6 +31,7 @@ namespace HoneyComb\Resources\Repositories\Admin;
 
 use HoneyComb\Resources\Models\HCResource;
 use HoneyComb\Core\Repositories\Traits\HCQueryBuilderTrait;
+use HoneyComb\Resources\Requests\Admin\HCResourceRequest;
 use HoneyComb\Starter\Repositories\HCBaseRepository;
 use Illuminate\Http\UploadedFile;
 
@@ -133,5 +134,19 @@ class HCResourceRepository extends HCBaseRepository
         }
 
         return $deleted;
+    }
+
+    /**
+     * Create data list
+     * @param HCResourceRequest $request
+     */
+    public function getOptions(HCResourceRequest $request)
+    {
+        return $this->createBuilderQuery($request)->get()->map(function ($record) {
+            return [
+                'id' => $record->id,
+                'path' => $record->path
+            ];
+        });
     }
 }

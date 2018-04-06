@@ -25,10 +25,9 @@
  * http://www.interactivesolutions.lt
  */
 
-declare(strict_types = 1);
-
 namespace HoneyComb\Resources\Http\Events\Frontend;
 
+use HoneyComb\Resources\Models\HCResource;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -46,7 +45,7 @@ class HCResourceCreated
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * @var
+     * @var HCResource
      */
     public $record;
 
@@ -55,7 +54,7 @@ class HCResourceCreated
      *
      * @return void
      */
-    public function __construct($record)
+    public function __construct(HCResource $record)
     {
         $this->record = $record;
     }

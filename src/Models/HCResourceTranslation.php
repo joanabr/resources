@@ -38,6 +38,13 @@ use HoneyComb\Starter\Models\HCModel;
 class HCResourceTranslation extends HCModel
 {
     /**
+     * Primary key field
+     *
+     * @var string
+     */
+    protected $primaryKey = 'count';
+
+    /**
      * The database table used by the model.
      *
      * @var string

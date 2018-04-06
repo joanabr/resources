@@ -31,6 +31,7 @@ namespace HoneyComb\Resources\Repositories\Admin;
 
 use HoneyComb\Resources\Models\HCResourceAuthor;
 use HoneyComb\Core\Repositories\Traits\HCQueryBuilderTrait;
+use HoneyComb\Resources\Requests\Admin\HCResourceAuthorRequest;
 use HoneyComb\Starter\Repositories\HCBaseRepository;
 
 /**
@@ -110,5 +111,15 @@ class HCResourceAuthorRepository extends HCBaseRepository
         }
 
         return $deleted;
+    }
+
+    public function getOptions(HCResourceAuthorRequest $request)
+    {
+        return $this->createBuilderQuery($request)->get()->map(function ($record) {
+            return [
+                'id' => $record->id,
+                'name' => $record->name
+            ];
+        });
     }
 }

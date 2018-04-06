@@ -135,6 +135,18 @@ class HCResourceAuthorController extends HCBaseController
     }
 
     /**
+     * Create data list
+     * @param HCResourceAuthorRequest $request
+     * @return JsonResponse
+     */
+    public function getOptions(HCResourceAuthorRequest $request): JsonResponse
+    {
+        return response()->json(
+            $this->service->getRepository()->getOptions($request)
+        );
+    }
+
+    /**
      * Creating record
      *
      * @param HCResourceAuthorRequest $request
