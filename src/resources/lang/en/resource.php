@@ -15,4 +15,5 @@ return [
     'caption' => 'Caption',
     'alt_text' => 'Alt text',
     'description' => 'Description',
+    'full_path' => 'Full path',
 ];
