@@ -45,8 +45,7 @@ Route::prefix(config('hc.admin_url'))
 
 
             Route::get('options', 'HCResourceAuthorController@getOptions')
-                ->name('admin.api.resource.author.list')
-                ->middleware('acl:honey_comb_resources_resource_author_admin_list');
+                ->name('admin.api.resource.author.options');
 
             Route::post('/', 'HCResourceAuthorController@store')
                 ->name('admin.api.resource.author.create')

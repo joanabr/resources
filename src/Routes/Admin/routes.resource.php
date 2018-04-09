@@ -43,8 +43,7 @@ Route::prefix(config('hc.admin_url'))
                 ->middleware('acl:honey_comb_resources_resource_admin_list');
 
             Route::get('options', 'HCResourceController@getOptions')
-                ->name('admin.api.resource.list')
-                ->middleware('acl:honey_comb_resources_resource_admin_list');
+                ->name('admin.api.resource.options');
 
             Route::delete('/', 'HCResourceController@deleteSoft')
                 ->name('admin.api.resource.delete')
