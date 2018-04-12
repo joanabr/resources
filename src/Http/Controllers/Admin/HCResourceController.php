@@ -1,13 +1,42 @@
 <?php
+/**
+ * @copyright 2018 interactivesolutions
+ *  
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *  
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *  
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *  
+ * Contact InteractiveSolutions:
+ * E-mail: hello@interactivesolutions.lt
+ * http://www.interactivesolutions.lt
+ */
 
 declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Http\Controllers\Admin;
 
+use HoneyComb\Resources\Events\Admin\Resource\HCResourceCreated;
+use HoneyComb\Resources\Events\Admin\Resource\HCResourceUpdated;
+use HoneyComb\Resources\Events\Admin\Resource\HCResourceRestored;
+use HoneyComb\Resources\Events\Admin\Resource\HCResourceSoftDeleted;
+use HoneyComb\Resources\Events\Admin\Resource\HCResourceForceDeleted;
 use HoneyComb\Resources\Services\HCResourceService;
-use HoneyComb\Resources\Requests\HCResourceRequest;
+use HoneyComb\Resources\Requests\Admin\HCResourceRequest;
 use HoneyComb\Resources\Models\HCResource;
-
 use HoneyComb\Core\Http\Controllers\HCBaseController;
 use HoneyComb\Core\Http\Controllers\Traits\HCAdminListHeaders;
 use HoneyComb\Starter\Helpers\HCFrontendResponse;
@@ -15,6 +44,10 @@ use Illuminate\Database\Connection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 
+/**
+ * Class HCResourceController
+ * @package HoneyComb\Resources\Http\Controllers\Admin
+ */
 class HCResourceController extends HCBaseController
 {
     use HCAdminListHeaders;
@@ -27,12 +60,12 @@ class HCResourceController extends HCBaseController
     /**
      * @var Connection
      */
-    private $connection;
+    protected $connection;
 
     /**
      * @var HCFrontendResponse
      */
-    private $response;
+    protected $response;
 
     /**
      * HCResourceController constructor.
@@ -86,7 +119,7 @@ class HCResourceController extends HCBaseController
 
     /**
      * @param string $id
-     * @return \HoneyComb\Resources\Models\HCResource|\HoneyComb\Resources\Repositories\HCResourceRepository|\Illuminate\Database\Eloquent\Model|null
+     * @return \HoneyComb\Resources\Models\HCResource|\HoneyComb\Resources\Repositories\Admin\HCResourceRepository|\Illuminate\Database\Eloquent\Model|null
      */
     public function getById(string $id)
     {
@@ -106,18 +139,29 @@ class HCResourceController extends HCBaseController
     }
 
     /**
-     * Creating record
-     *
+     * Create data list
      * @param HCResourceRequest $request
      * @return JsonResponse
+     */
+    public function getOptions(HCResourceRequest $request): JsonResponse
+    {
+        return response()->json(
+            $this->service->getRepository()->getOptions($request)
+        );
+    }
+
+    /**
+     * @param HCResourceRequest $request
+     * @return JsonResponse
+     * @throws \Exception
      */
     public function store(HCResourceRequest $request): JsonResponse
     {
         $this->connection->beginTransaction();
 
         try {
-            $model = $this->service->getRepository()->create($request->getRecordData());
-            $model->updateTranslations($request->getTranslations());
+            $record = $this->service->getRepository()->create($request->getRecordData());
+            $record->updateTranslations($request->getTranslations());
 
             $this->connection->commit();
         } catch (\Exception $e) {
@@ -125,6 +169,8 @@ class HCResourceController extends HCBaseController
 
             return $this->response->error($e->getMessage());
         }
+
+        event(new HCResourceCreated($record));
 
         return $this->response->success("Created");
     }
@@ -138,9 +184,16 @@ class HCResourceController extends HCBaseController
      */
     public function update(HCResourceRequest $request, string $id): JsonResponse
     {
-        $model = $this->service->getRepository()->findOneBy(['id' => $id]);
-        $model->update($request->getRecordData());
-        $model->updateTranslations($request->getTranslations());
+        /** @var HCResource $record */
+        $record = $this->service->getRepository()->findOneBy(['id' => $id]);
+        $record->update($request->getRecordData());
+        $record->updateTranslations($request->getTranslations());
+
+        if ($record) {
+            $record = $this->service->getRepository()->find($id);
+
+            event(new HCResourceUpdated($record));
+        }
 
         return $this->response->success("Created");
     }
@@ -155,7 +208,7 @@ class HCResourceController extends HCBaseController
         $this->connection->beginTransaction();
 
         try {
-            $this->service->getRepository()->deleteSoft($request->getListIds());
+            $deleted = $this->service->getRepository()->deleteSoft($request->getListIds());
 
             $this->connection->commit();
         } catch (\Exception $exception) {
@@ -163,6 +216,8 @@ class HCResourceController extends HCBaseController
 
             return $this->response->error($exception->getMessage());
         }
+
+        event(new HCResourceSoftDeleted($deleted));
 
         return $this->response->success('Successfully deleted');
     }
@@ -177,7 +232,7 @@ class HCResourceController extends HCBaseController
         $this->connection->beginTransaction();
 
         try {
-            $this->service->getRepository()->restore($request->getListIds());
+            $restored = $this->service->getRepository()->restore($request->getListIds());
 
             $this->connection->commit();
         } catch (\Exception $exception) {
@@ -185,6 +240,8 @@ class HCResourceController extends HCBaseController
 
             return $this->response->error($exception->getMessage());
         }
+
+        event(new HCResourceRestored($restored));
 
         return $this->response->success('Successfully restored');
     }
@@ -199,7 +256,7 @@ class HCResourceController extends HCBaseController
         $this->connection->beginTransaction();
 
         try {
-            $this->service->getRepository()->deleteForce($request->getListIds());
+            $deleted = $this->service->getRepository()->deleteForce($request->getListIds());
 
             $this->connection->commit();
         } catch (\Exception $exception) {
@@ -207,6 +264,8 @@ class HCResourceController extends HCBaseController
 
             return $this->response->error($exception->getMessage());
         }
+
+        event(new HCResourceForceDeleted($deleted));
 
         return $this->response->success('Successfully deleted');
     }
