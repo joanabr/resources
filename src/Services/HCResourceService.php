@@ -212,10 +212,10 @@ class HCResourceService
      * @param UploadedFile $file
      * @param bool $full
      * @param string $id
-     * @return mixed
+     * @return array
      * @throws \Exception
      */
-    public function upload(UploadedFile $file, bool $full = null, string $id = null)
+    public function upload(UploadedFile $file, bool $full = null, string $id = null): array
     {
         if (is_null($file)) {
             throw new \Exception(trans('resources::resources.errors.no_resource_selected'));

@@ -31,7 +31,7 @@ namespace HoneyComb\Resources\Http\Controllers\Frontend;
 
 use HoneyComb\Resources\Http\Events\Frontend\HCResourceCreated;
 use HoneyComb\Core\Http\Controllers\HCBaseController;
-use HoneyComb\Resources\Requests\Admin\HCResourceRequest;
+use HoneyComb\Resources\Requests\Frontend\HCResourceRequest;
 use HoneyComb\Resources\Services\HCResourceService;
 use HoneyComb\Starter\Helpers\HCFrontendResponse;
 use Illuminate\Database\Connection;

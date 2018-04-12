@@ -45,7 +45,7 @@ class HCResourceCreated
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * @var HCResource
+     * @var array
      */
     public $record;
 
@@ -54,7 +54,7 @@ class HCResourceCreated
      *
      * @return void
      */
-    public function __construct(HCResource $record)
+    public function __construct(array $record)
     {
         $this->record = $record;
     }
