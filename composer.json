@@ -57,9 +57,6 @@
         ]
     },
     "config": {
-        "secure-http": false,
-        "platform": {
-            "php": "7.1"
-        }
+        "secure-http": false
     }
 }
