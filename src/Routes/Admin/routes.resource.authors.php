@@ -35,14 +35,14 @@ Route::domain(config('hc.admin_domain'))
 
         Route::get('resource/author', 'HCResourceAuthorController@index')
             ->name('admin.resource.author.index')
-            ->middleware('acl:honey_comb_resources_resource_author_admin_list');
+            ->middleware('acl:honey_comb_resources_resource_author_list');
 
 
         Route::prefix('api/resource/author')->group(function() {
 
             Route::get('/', 'HCResourceAuthorController@getListPaginate')
                 ->name('admin.api.resource.author')
-                ->middleware('acl:honey_comb_resources_resource_author_admin_list');
+                ->middleware('acl:honey_comb_resources_resource_author_list');
 
 
             Route::get('options', 'HCResourceAuthorController@getOptions')
@@ -50,34 +50,34 @@ Route::domain(config('hc.admin_domain'))
 
             Route::post('/', 'HCResourceAuthorController@store')
                 ->name('admin.api.resource.author.create')
-                ->middleware('acl:honey_comb_resources_resource_author_admin_create');
+                ->middleware('acl:honey_comb_resources_resource_author_create');
 
             Route::delete('/', 'HCResourceAuthorController@deleteSoft')
                 ->name('admin.api.resource.author.delete')
-                ->middleware('acl:honey_comb_resources_resource_author_admin_delete');
+                ->middleware('acl:honey_comb_resources_resource_author_delete');
 
             Route::delete('force', 'HCResourceAuthorController@deleteForce')
                 ->name('admin.api.resource.author.delete.force')
-                ->middleware('acl:honey_comb_resources_resource_author_admin_delete_force');
+                ->middleware('acl:honey_comb_resources_resource_author_delete_force');
 
             Route::post('restore', 'HCResourceAuthorController@restore')
                 ->name('admin.api.resource.author.restore')
-                ->middleware('acl:honey_comb_resources_resource_author_admin_restore');
+                ->middleware('acl:honey_comb_resources_resource_author_restore');
 
 
             Route::prefix('{id}')->group(function() {
 
                 Route::get('/', 'HCResourceAuthorController@getById')
                     ->name('admin.api.resource.author.single')
-                    ->middleware('acl:honey_comb_resources_resource_author_admin_list');
+                    ->middleware('acl:honey_comb_resources_resource_author_list');
 
                 Route::put('/', 'HCResourceAuthorController@update')
                     ->name('admin.api.resource.author.update')
-                    ->middleware('acl:honey_comb_resources_resource_author_admin_update');
+                    ->middleware('acl:honey_comb_resources_resource_author_update');
 
                 Route::patch('/', 'HCResourceAuthorController@patch')
                     ->name('admin.api.resource.author.patch')
-                    ->middleware('acl:honey_comb_resources_resource_author_admin_update');
+                    ->middleware('acl:honey_comb_resources_resource_author_update');
 
 
             });

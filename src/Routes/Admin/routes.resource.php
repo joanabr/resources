@@ -35,39 +35,39 @@ Route::domain(config('hc.admin_domain'))
 
         Route::get('resource', 'HCResourceController@index')
             ->name('admin.resource.index')
-            ->middleware('acl:honey_comb_resources_resource_admin_list');
+            ->middleware('acl:honey_comb_resources_resource_list');
 
         Route::prefix('api/resource')->group(function() {
 
             Route::get('/', 'HCResourceController@getListPaginate')
                 ->name('admin.api.resource')
-                ->middleware('acl:honey_comb_resources_resource_admin_list');
+                ->middleware('acl:honey_comb_resources_resource_list');
 
             Route::get('options', 'HCResourceController@getOptions')
                 ->name('admin.api.resource.options');
 
             Route::delete('/', 'HCResourceController@deleteSoft')
                 ->name('admin.api.resource.delete')
-                ->middleware('acl:honey_comb_resources_resource_admin_delete');
+                ->middleware('acl:honey_comb_resources_resource_delete');
 
             Route::delete('force', 'HCResourceController@deleteForce')
                 ->name('admin.api.resource.delete.force')
-                ->middleware('acl:honey_comb_resources_resource_admin_delete_force');
+                ->middleware('acl:honey_comb_resources_resource_delete_force');
 
             Route::post('restore', 'HCResourceController@restore')
                 ->name('admin.api.resource.restore')
-                ->middleware('acl:honey_comb_resources_resource_admin_restore');
+                ->middleware('acl:honey_comb_resources_resource_restore');
 
 
             Route::prefix('{id}')->group(function() {
 
                 Route::get('/', 'HCResourceController@getById')
                     ->name('admin.api.resource.single')
-                    ->middleware('acl:honey_comb_resources_resource_admin_list');
+                    ->middleware('acl:honey_comb_resources_resource_list');
 
                 Route::put('/', 'HCResourceController@update')
                     ->name('admin.api.resource.update')
-                    ->middleware('acl:honey_comb_resources_resource_admin_update');
+                    ->middleware('acl:honey_comb_resources_resource_update');
 
             });
         });

@@ -39,7 +39,8 @@
                     "honey_comb_resources_resource_delete",
                     "honey_comb_resources_resource_delete_force",
                     "honey_comb_resources_resource_restore",
-                    "honey_comb_resources_resource_list"
+                    "honey_comb_resources_resource_list",
+                    "honey_comb_resources_resource_update"
                 ]
             },
             {
