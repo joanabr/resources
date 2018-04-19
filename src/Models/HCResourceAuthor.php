@@ -29,13 +29,13 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Models;
 
-use HoneyComb\Starter\Models\HCUuidModel;
+use HoneyComb\Starter\Models\HCUuidSoftModel;
 
 /**
  * Class HCResourceAuthor
  * @package HoneyComb\Resources\Models
  */
-class HCResourceAuthor extends HCUuidModel
+class HCResourceAuthor extends HCUuidSoftModel
 {
     /**
      * The database table used by the model.
