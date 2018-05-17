@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2018 innovationbase
+ * @copyright 2018 interactivesolutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,9 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * Contact InnovationBase:
- * E-mail: hello@innovationbase.eu
- * https://innovationbase.eu
+ * Contact InteractiveSolutions:
+ * E-mail: hello@interactivesolutions.lt
+ * http://www.interactivesolutions.lt
  */
 
 declare(strict_types = 1);
@@ -133,17 +133,25 @@ class HCResourceService
             $resource->size = File::size($cachePath);
             $resource->path = $cachePath;
         } else {
+
+
             switch ($resource->mime_type) {
                 case 'text/plain' :
                     if ($resource->extension == '.svg') {
                         $resource->mime_type = 'image/svg+xml';
                     }
+
+                    $resource->path = $storagePath . $resource->path;
+                    break;
                 case 'image/png' :
                 case 'image/jpeg' :
                 case 'image/svg' :
                     if ($resource->mime_type = 'image/svg') {
                         $resource->mime_type = 'image/svg+xml';
                     }
+
+                    $resource->path = $storagePath . $resource->path;
+                    break;
                 case 'image/jpg' :
 
                     if ($width != 0 && $height != 0) {
