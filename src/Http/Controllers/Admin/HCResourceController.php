@@ -106,7 +106,7 @@ class HCResourceController extends HCBaseController
     public function getTableColumns(): array
     {
         $columns = [
-            'id' => $this->headerImage(trans('HCResource::resource.preview')),
+            'id' => $this->headerImage(trans('HCResource::resource.preview'), 100, 100, true),
             'uploaded_by' => $this->headerText(trans('HCResource::resource.uploaded_by')),
             'path' => $this->headerText(trans('HCResource::resource.path')),
             'original_name' => $this->headerText(trans('HCResource::resource.original_name')),
