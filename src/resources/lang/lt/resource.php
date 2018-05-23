@@ -42,4 +42,5 @@ return [
     'alt_text' => 'Alt text',
     'description' => 'Aprašymas',
     'full_path' => 'Pilnas kelias',
+    'resource' => 'Resursas',
 ];

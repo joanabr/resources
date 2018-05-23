@@ -27,5 +27,7 @@
 
 return [
     "page_title" => "Autoriai",
-    "name" => "Pilnas vardas",
+    "name" => "Pavadinimas",
+    "description" => "Aprašymas",
+    "copyright" => "Copyright",
 ];

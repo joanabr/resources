@@ -28,4 +28,6 @@
 return [
     "page_title" => "Authors",
     "name" => "Name",
+    "description" => "Description",
+    "copyright" => "Copyright",
 ];
