@@ -113,7 +113,7 @@ class HCResourceService
         $storagePath = storage_path('app/');
 
         // cache resource for 10 days
-        $resource = \Cache::remember($id, 14400, function () use ($id) {
+        $resource = \Cache::remember($id, 14400, function() use ($id) {
             return HCResource::find($id);
         });
 
@@ -134,7 +134,6 @@ class HCResourceService
             $resource->path = $cachePath;
         } else {
 
-
             switch ($resource->mime_type) {
                 case 'text/plain' :
                     if ($resource->extension == '.svg') {
@@ -143,8 +142,7 @@ class HCResourceService
 
                     $resource->path = $storagePath . $resource->path;
                     break;
-                case 'image/png' :
-                case 'image/jpeg' :
+
                 case 'image/svg' :
                     if ($resource->mime_type = 'image/svg') {
                         $resource->mime_type = 'image/svg+xml';
@@ -152,7 +150,10 @@ class HCResourceService
 
                     $resource->path = $storagePath . $resource->path;
                     break;
+
                 case 'image/jpg' :
+                case 'image/png' :
+                case 'image/jpeg' :
 
                     if ($width != 0 && $height != 0) {
 
@@ -514,11 +515,11 @@ class HCResourceService
         $image = Image::make($source);
 
         if ($fit) {
-            $image->fit($width, $height, function (Constraint $constraint) {
+            $image->fit($width, $height, function(Constraint $constraint) {
                 $constraint->upsize();
             });
         } else {
-            $image->resize($width, $height, function (Constraint $constraint) {
+            $image->resize($width, $height, function(Constraint $constraint) {
                 $constraint->upsize();
                 $constraint->aspectRatio();
             });
