@@ -41,6 +41,7 @@ use HoneyComb\Core\Http\Controllers\HCBaseController;
 use HoneyComb\Core\Http\Controllers\Traits\HCAdminListHeaders;
 use HoneyComb\Starter\Helpers\HCFrontendResponse;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 
@@ -123,7 +124,10 @@ class HCResourceController extends HCBaseController
      */
     public function getById(string $id)
     {
-        return $this->service->getRepository()->findOneBy(['id' => $id]);
+        return $this->service->getRepository()->makeQuery()->with([
+            'author' => function (HasOne $builder){
+                $builder->select('id', 'name as label');
+            }])->find($id);
     }
 
     /**
@@ -160,6 +164,7 @@ class HCResourceController extends HCBaseController
         $this->connection->beginTransaction();
 
         try {
+            /** @var HCResource $record */
             $record = $this->service->getRepository()->create($request->getRecordData());
             $record->updateTranslations($request->getTranslations());
 

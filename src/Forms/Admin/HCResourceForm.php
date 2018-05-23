@@ -86,6 +86,7 @@ class HCResourceForm extends HCBaseForm
         return [
             $prefix . 'id' =>
                 [
+                    'tab' => trans('HCResource::resource.resource'),
                     'type' => 'media',
                     'viewUrl' => route('resource.get', '/'),
                     'hideDelete' => 1,
@@ -93,36 +94,39 @@ class HCResourceForm extends HCBaseForm
                     'width' => 540,
                     'height' => 400,
                 ],
-            $prefix . 'author_id' =>
+            $prefix . 'author' =>
                 [
-                    'type' => 'singleLine',
+                    'tab' => trans('HCResource::resource.resource'),
+                    'type' => 'dropDownSearchable',
                     'label' => trans('HCResource::resource.author'),
+                    'new' => route('admin.api.form-manager', ['resource.author-new']),
+                    'searchUrl' => route('admin.api.resource.author.options'),
                 ],
-
             $prefix . 'translations.label' =>
                 [
+                    'tab' => trans('HCResource::resource.resource'),
                     'type' => 'singleLine',
                     'label' => trans('HCResource::resource.label'),
                     'multiLanguage' => 1,
                     'required' => 1,
                 ],
-
             $prefix . 'translations.caption' =>
                 [
+                    'tab' => trans('HCResource::resource.resource'),
                     'type' => 'textArea',
                     'label' => trans('HCResource::resource.caption'),
                     'multiLanguage' => 1,
                 ],
-
             $prefix . 'translations.alt_text' =>
                 [
+                    'tab' => trans('HCResource::resource.resource'),
                     'type' => 'singleLine',
                     'label' => trans('HCResource::resource.alt_text'),
                     'multiLanguage' => 1,
                 ],
-
             $prefix . 'translations.description' =>
                 [
+                    'tab' => trans('HCResource::resource.resource'),
                     'type' => 'textArea',
                     'label' => trans('HCResource::resource.description'),
                     'multiLanguage' => 1,
