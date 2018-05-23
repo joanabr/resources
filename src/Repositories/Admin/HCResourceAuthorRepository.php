@@ -113,12 +113,16 @@ class HCResourceAuthorRepository extends HCBaseRepository
         return $deleted;
     }
 
+    /**
+     * @param \HoneyComb\Resources\Requests\Admin\HCResourceAuthorRequest $request
+     * @return \Illuminate\Support\Collection|static
+     */
     public function getOptions(HCResourceAuthorRequest $request)
     {
         return $this->createBuilderQuery($request)->get()->map(function ($record) {
             return [
                 'id' => $record->id,
-                'name' => $record->name
+                'label' => $record->name
             ];
         });
     }
