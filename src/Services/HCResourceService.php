@@ -418,7 +418,7 @@ class HCResourceService
         $explodedByParams = explode('?', $fileName);
         $fileName = head($explodedByParams);
 
-        if (strpos($fileName, '.') !== false) {
+        if (strpos($fileName, '.') !== false && substr($fileName, -3) != 'php') {
             return sanitizeString(pathinfo($fileName, PATHINFO_FILENAME)) . '.' . pathinfo($fileName,
                     PATHINFO_EXTENSION);
         } else {
