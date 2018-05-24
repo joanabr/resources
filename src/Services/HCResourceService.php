@@ -412,6 +412,21 @@ class HCResourceService
             return null;
         }
 
+        $headers = (get_headers($fileName));
+
+        foreach ($headers as $header) {
+            if (strpos($header, 'filename')) {
+                $name = explode('filename="', $header);
+                $name = rtrim($name[1], '"');
+
+                $name = explode('.', $name);
+
+                if (sizeof($name) > 1) {
+                    return implode('.', $name);
+                }
+            }
+        }
+
         $explodeFileURL = explode('/', $fileName);
         $fileName = end($explodeFileURL);
 
