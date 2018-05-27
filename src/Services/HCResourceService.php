@@ -29,6 +29,7 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Services;
 
+use Carbon\Carbon;
 use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
 use File;
@@ -354,6 +355,7 @@ class HCResourceService
         $params['size'] = $file->getClientSize();
         $params['mime_type'] = $file->getClientMimeType();
         $params['uploaded_by'] = auth()->check() ? auth()->id() : null;
+        $params['original_at'] = request()->has('lastModified') ? Carbon::createFromTimestampMs(request()->get('lastModified')) : null;
 
         return $params;
     }
@@ -408,21 +410,23 @@ class HCResourceService
      */
     protected function getFileName(string $fileName): ? string
     {
-        if (!$fileName && filter_var($fileName, FILTER_VALIDATE_URL) === false) {
+        if (!$fileName) {
             return null;
         }
 
-        $headers = (get_headers($fileName));
+        if (filter_var($fileName, FILTER_VALIDATE_URL)) {
+            $headers = (get_headers($fileName));
 
-        foreach ($headers as $header) {
-            if (strpos($header, 'filename')) {
-                $name = explode('filename="', $header);
-                $name = rtrim($name[1], '"');
+            foreach ($headers as $header) {
+                if (strpos($header, 'filename')) {
+                    $name = explode('filename="', $header);
+                    $name = rtrim($name[1], '"');
 
-                $name = explode('.', $name);
+                    $name = explode('.', $name);
 
-                if (sizeof($name) > 1) {
-                    return implode('.', $name);
+                    if (sizeof($name) > 1) {
+                        return implode('.', $name);
+                    }
                 }
             }
         }
