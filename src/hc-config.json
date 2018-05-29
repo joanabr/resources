@@ -6,7 +6,8 @@
     },
     "formData": {
         "resource.author": "HoneyComb\\Resources\\Forms\\Admin\\HCResourceAuthorForm",
-        "resource": "HoneyComb\\Resources\\Forms\\Admin\\HCResourceForm"
+        "resource": "HoneyComb\\Resources\\Forms\\Admin\\HCResourceForm",
+        "resource.thumb": "HoneyComb\\Resources\\Forms\\HCResourceThumbForm"
     },
     "adminMenu": [
         {
@@ -22,12 +23,20 @@
             "translation": "HCResource::resource_author.page_title",
             "icon": "user-secret",
             "aclPermission": "honey_comb_resources_resource_author_list"
+        },
+        {
+            "route": "admin.resource.thumb.index",
+            "parent": "admin.resource.index",
+            "translation": "HCResource::resource_thumb.page_title",
+            "icon": "object-ungroup",
+            "aclPermission": "honey_comb_resources_resource_thumb_list"
         }
     ],
     "seeder": "",
     "routes": [
         "Routes\/Frontend\/routes.resources.php",
         "Routes\/Admin\/routes.resource.authors.php",
+        "Routes\/Admin\/routes.resource.thumb.php",
         "Routes\/Admin\/routes.resource.php"
     ],
     "acl": {
@@ -53,6 +62,14 @@
                     "honey_comb_resources_resource_author_delete_force",
                     "honey_comb_resources_resource_author_restore",
                     "honey_comb_resources_resource_author_list"
+                ]
+            },
+            {
+                "name": "acl.resource.thumb",
+                "controller": "HoneyComb\\Resources\\Http\\Controllers\\Admin\\HCResourceThumbController",
+                "actions": [
+                    "honey_comb_resources_resource_thumb_update",
+                    "honey_comb_resources_resource_thumb_list"
                 ]
             }
         ]
