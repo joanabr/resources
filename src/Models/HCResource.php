@@ -67,6 +67,7 @@ class HCResource extends HCUuidSoftModel
     ];
 
     protected $with = [
+        'author',
         'translation',
         'translations',
     ];
