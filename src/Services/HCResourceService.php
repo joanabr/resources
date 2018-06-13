@@ -224,42 +224,46 @@ class HCResourceService
      * @param UploadedFile $file
      * @param bool $full
      * @param string $id
+     * @param \HoneyComb\Resources\Models\HCResource|null $resource
      * @return array
      * @throws \Exception
      */
-    public function upload(UploadedFile $file, bool $full = null, string $id = null): array
+    public function upload(UploadedFile $file, bool $full = null, string $id = null, HCResource $resource = null): array
     {
-        if (is_null($file)) {
-            throw new \Exception(trans('resources::resources.errors.no_resource_selected'));
-        }
+        if (!$resource)
+        {
+            if (is_null($file)) {
+                throw new \Exception(trans('HCResource::resource.error.no_resource_selected'));
+            }
 
-        $this->resourceId = $id;
+            $this->resourceId = $id;
 
-        try {
-            $resource = $this->repository->create(
-                $this->getFileParams($file)
-            );
-
-            $this->saveResourceInStorage($resource, $file);
-
-            // generate checksum
-            if ($resource['size'] <= config('resources.max_checksum_size', self::MAX_CHECKSUM_SIZE)) {
-                $this->repository->update(
-                    [
-                        'checksum' => hash_file('sha256', storage_path('app/' . $resource['path'])),
-                    ],
-                    $resource->id
+            try {
+                /** @var HCResource $resource */
+                $resource = $this->repository->create(
+                    $this->getFileParams($file)
                 );
+
+                $this->saveResourceInStorage($resource, $file);
+
+                // generate checksum
+                if ($resource['size'] <= config('resources.max_checksum_size', self::MAX_CHECKSUM_SIZE)) {
+                    $this->repository->update(
+                        [
+                            'checksum' => hash_file('sha256', storage_path('app/' . $resource['path'])),
+                        ],
+                        $resource->id
+                    );
+                }
+
+            } catch (\Exception $e) {
+
+                if (isset($resource)) {
+                    $this->removeImageFromStorage($resource);
+                }
+
+                throw $e;
             }
-
-//            Artisan::call('hc:generate-thumbs', ['id' => $resource->id]);
-        } catch (\Exception $e) {
-
-            if (isset($resource)) {
-                $this->removeImageFromStorage($resource);
-            }
-
-            throw $e;
         }
 
         if ($full) {
@@ -284,6 +288,22 @@ class HCResourceService
      */
     public function download(string $source, bool $full = null, string $id = null, string $mime_type = null)
     {
+        if ($id) {
+            $resource = $this->repository->find($id);
+
+            if ($resource) {
+
+                if ($full) {
+                    return $resource->toArray();
+                }
+
+                return [
+                    'id' => $resource->id,
+                    'url' => route('resource.get', $resource->id),
+                ];
+            }
+        }
+
         $this->createFolder('uploads/tmp');
 
         $fileName = $this->getFileName($source);
