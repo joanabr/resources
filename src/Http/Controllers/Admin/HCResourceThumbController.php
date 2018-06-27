@@ -4,12 +4,10 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Http\Controllers\Admin;
 
-use HoneyComb\Resources\Services\HCResourceThumbService;
-use HoneyComb\Resources\Http\Requests\HCResourceThumbRequest;
-use HoneyComb\Resources\Models\HCResourceThumb;
-
 use HoneyComb\Core\Http\Controllers\HCBaseController;
 use HoneyComb\Core\Http\Controllers\Traits\HCAdminListHeaders;
+use HoneyComb\Resources\Http\Requests\HCResourceThumbRequest;
+use HoneyComb\Resources\Services\HCResourceThumbService;
 use HoneyComb\Starter\Helpers\HCFrontendResponse;
 use Illuminate\Database\Connection;
 use Illuminate\Http\JsonResponse;

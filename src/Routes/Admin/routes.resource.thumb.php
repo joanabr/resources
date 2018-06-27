@@ -30,13 +30,13 @@ declare(strict_types = 1);
 Route::prefix(config('hc.admin_url'))
     ->namespace('Admin')
     ->middleware(['web', 'auth'])
-    ->group(function() {
+    ->group(function () {
 
         Route::get('resource/thumb', 'HCResourceThumbController@index')
             ->name('admin.resource.thumb.index')
             ->middleware('acl:honey_comb_resources_resource_thumb_admin_list');
 
-        Route::prefix('api/resource/thumb')->group(function() {
+        Route::prefix('api/resource/thumb')->group(function () {
 
             Route::get('/', 'HCResourceThumbController@getListPaginate')
                 ->name('admin.api.resource.thumb')
@@ -49,7 +49,7 @@ Route::prefix(config('hc.admin_url'))
             Route::get('options', 'HCResourceThumbController@getOptions')
                 ->name('admin.api.resource.thumb.list');
 
-            Route::prefix('{id}')->group(function() {
+            Route::prefix('{id}')->group(function () {
 
                 Route::get('/', 'HCResourceThumbController@getById')
                     ->name('admin.api.resource.thumb.single')

@@ -1,17 +1,17 @@
 <?php
 /**
  * @copyright 2018 interactivesolutions
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- *  
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -19,7 +19,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *  
+ *
  * Contact InteractiveSolutions:
  * E-mail: hello@interactivesolutions.lt
  * http://www.interactivesolutions.lt
@@ -29,16 +29,16 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Http\Controllers\Admin;
 
-use HoneyComb\Resources\Events\Admin\Resource\HCResourceCreated;
-use HoneyComb\Resources\Events\Admin\Resource\HCResourceUpdated;
-use HoneyComb\Resources\Events\Admin\Resource\HCResourceRestored;
-use HoneyComb\Resources\Events\Admin\Resource\HCResourceSoftDeleted;
-use HoneyComb\Resources\Events\Admin\Resource\HCResourceForceDeleted;
-use HoneyComb\Resources\Services\HCResourceService;
-use HoneyComb\Resources\Requests\Admin\HCResourceRequest;
-use HoneyComb\Resources\Models\HCResource;
 use HoneyComb\Core\Http\Controllers\HCBaseController;
 use HoneyComb\Core\Http\Controllers\Traits\HCAdminListHeaders;
+use HoneyComb\Resources\Events\Admin\Resource\HCResourceCreated;
+use HoneyComb\Resources\Events\Admin\Resource\HCResourceForceDeleted;
+use HoneyComb\Resources\Events\Admin\Resource\HCResourceRestored;
+use HoneyComb\Resources\Events\Admin\Resource\HCResourceSoftDeleted;
+use HoneyComb\Resources\Events\Admin\Resource\HCResourceUpdated;
+use HoneyComb\Resources\Models\HCResource;
+use HoneyComb\Resources\Requests\Admin\HCResourceRequest;
+use HoneyComb\Resources\Services\HCResourceService;
 use HoneyComb\Starter\Helpers\HCFrontendResponse;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -112,7 +112,8 @@ class HCResourceController extends HCBaseController
             'path' => $this->headerText(trans('HCResource::resource.path')),
             'original_name' => $this->headerText(trans('HCResource::resource.original_name')),
             'size' => $this->headerText(trans('HCResource::resource.size')),
-            'full_path' => $this->headerCopy(trans('HCResource::resource.full_path'), 'id', route('resource.get', '') . '/'),
+            'full_path' => $this->headerCopy(trans('HCResource::resource.full_path'), 'id',
+                route('resource.get', '') . '/'),
         ];
 
         return $columns;
@@ -125,9 +126,10 @@ class HCResourceController extends HCBaseController
     public function getById(string $id)
     {
         return $this->service->getRepository()->makeQuery()->with([
-            'author' => function (HasOne $builder){
+            'author' => function (HasOne $builder) {
                 $builder->select('id', 'name as label');
-            }])->find($id);
+            },
+        ])->find($id);
     }
 
     /**
@@ -169,10 +171,12 @@ class HCResourceController extends HCBaseController
             $record->updateTranslations($request->getTranslations());
 
             $this->connection->commit();
-        } catch (\Exception $e) {
+        } catch (\Throwable $exception) {
             $this->connection->rollBack();
 
-            return $this->response->error($e->getMessage());
+            report($exception);
+
+            return $this->response->error($exception->getMessage());
         }
 
         event(new HCResourceCreated($record));
@@ -216,8 +220,10 @@ class HCResourceController extends HCBaseController
             $deleted = $this->service->getRepository()->deleteSoft($request->getListIds());
 
             $this->connection->commit();
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $this->connection->rollBack();
+
+            report($exception);
 
             return $this->response->error($exception->getMessage());
         }
@@ -240,8 +246,10 @@ class HCResourceController extends HCBaseController
             $restored = $this->service->getRepository()->restore($request->getListIds());
 
             $this->connection->commit();
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $this->connection->rollBack();
+
+            report($exception);
 
             return $this->response->error($exception->getMessage());
         }
@@ -264,8 +272,10 @@ class HCResourceController extends HCBaseController
             $deleted = $this->service->getRepository()->deleteForce($request->getListIds());
 
             $this->connection->commit();
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $this->connection->rollBack();
+
+            report($exception);
 
             return $this->response->error($exception->getMessage());
         }

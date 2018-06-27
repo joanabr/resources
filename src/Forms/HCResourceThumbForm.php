@@ -92,21 +92,21 @@ class HCResourceThumbForm extends HCBaseForm
                     'type' => 'singleLine',
                     'label' => trans('HCResource::resource_thumb.width'),
                     'required' => 1,
-                    'readonly' => 1
+                    'readonly' => 1,
                 ],
             $prefix . 'height' =>
                 [
                     'type' => 'singleLine',
                     'label' => trans('HCResource::resource_thumb.height'),
                     'required' => 1,
-                    'readonly' => 1
+                    'readonly' => 1,
                 ],
             $prefix . 'fit' =>
                 [
                     'type' => 'dropDownList',
                     'label' => trans('HCResource::resource_thumb.fit'),
                     'options' => BoolEnum::options(),
-                    'readonly' => 1
+                    'readonly' => 1,
 
                 ],
             $prefix . 'grab_enabled' =>

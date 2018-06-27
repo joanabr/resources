@@ -114,7 +114,7 @@ class HCResourceService
         $storagePath = storage_path('app/');
 
         // cache resource for 10 days
-        $resource = \Cache::remember($id, 14400, function() use ($id) {
+        $resource = \Cache::remember($id, 14400, function () use ($id) {
             return HCResource::find($id);
         });
 
@@ -226,12 +226,11 @@ class HCResourceService
      * @param string $id
      * @param \HoneyComb\Resources\Models\HCResource|null $resource
      * @return array
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function upload(UploadedFile $file, bool $full = null, string $id = null, HCResource $resource = null): array
     {
-        if (!$resource)
-        {
+        if (!$resource) {
             if (is_null($file)) {
                 throw new \Exception(trans('HCResource::resource.error.no_resource_selected'));
             }
@@ -256,13 +255,13 @@ class HCResourceService
                     );
                 }
 
-            } catch (\Exception $e) {
+            } catch (\Throwable $exception) {
 
                 if (isset($resource)) {
                     $this->removeImageFromStorage($resource);
                 }
 
-                throw $e;
+                throw $exception;
             }
         }
 
@@ -284,7 +283,7 @@ class HCResourceService
      * @param string $id
      * @param null|string $mime_type
      * @return array|mixed|null
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function download(string $source, bool $full = null, string $id = null, string $mime_type = null)
     {
@@ -554,11 +553,11 @@ class HCResourceService
         $image = Image::make($source);
 
         if ($fit) {
-            $image->fit($width, $height, function(Constraint $constraint) {
+            $image->fit($width, $height, function (Constraint $constraint) {
                 $constraint->upsize();
             });
         } else {
-            $image->resize($width, $height, function(Constraint $constraint) {
+            $image->resize($width, $height, function (Constraint $constraint) {
                 $constraint->upsize();
                 $constraint->aspectRatio();
             });

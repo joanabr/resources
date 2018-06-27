@@ -4,8 +4,8 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Repositories;
 
-use HoneyComb\Resources\Models\HCResourceGrabProperty;
 use HoneyComb\Core\Repositories\Traits\HCQueryBuilderTrait;
+use HoneyComb\Resources\Models\HCResourceGrabProperty;
 use HoneyComb\Starter\Repositories\HCBaseRepository;
 
 class HCResourceGrabPropertyRepository extends HCBaseRepository
@@ -19,5 +19,5 @@ class HCResourceGrabPropertyRepository extends HCBaseRepository
     {
         return HCResourceGrabProperty::class;
     }
-    
+
 }

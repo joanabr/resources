@@ -29,16 +29,15 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Http\Controllers\Admin;
 
+use HoneyComb\Core\Http\Controllers\HCBaseController;
+use HoneyComb\Core\Http\Controllers\Traits\HCAdminListHeaders;
+use HoneyComb\Resources\Events\Admin\ResourceAuthor\HCResourceAuthorCreated;
 use HoneyComb\Resources\Events\Admin\ResourceAuthor\HCResourceAuthorForceDeleted;
 use HoneyComb\Resources\Events\Admin\ResourceAuthor\HCResourceAuthorRestored;
 use HoneyComb\Resources\Events\Admin\ResourceAuthor\HCResourceAuthorSoftDeleted;
-use HoneyComb\Resources\Events\Admin\ResourceAuthor\HCResourceAuthorCreated;
 use HoneyComb\Resources\Events\Admin\ResourceAuthor\HCResourceAuthorUpdated;
-use HoneyComb\Resources\Services\HCResourceAuthorService;
 use HoneyComb\Resources\Requests\Admin\HCResourceAuthorRequest;
-
-use HoneyComb\Core\Http\Controllers\HCBaseController;
-use HoneyComb\Core\Http\Controllers\Traits\HCAdminListHeaders;
+use HoneyComb\Resources\Services\HCResourceAuthorService;
 use HoneyComb\Starter\Helpers\HCFrontendResponse;
 use Illuminate\Database\Connection;
 use Illuminate\Http\JsonResponse;
@@ -160,10 +159,12 @@ class HCResourceAuthorController extends HCBaseController
             $resourceAuthor = $this->service->getRepository()->create($request->getRecordData());
 
             $this->connection->commit();
-        } catch (\Exception $e) {
+        } catch (\Throwable $exception) {
             $this->connection->rollBack();
 
-            return $this->response->error($e->getMessage());
+            report($exception);
+
+            return $this->response->error($exception->getMessage());
         }
 
         event(new HCResourceAuthorCreated($resourceAuthor));
@@ -214,8 +215,10 @@ class HCResourceAuthorController extends HCBaseController
             $deleted = $this->service->getRepository()->deleteSoft($request->getListIds());
 
             $this->connection->commit();
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $this->connection->rollBack();
+
+            report($exception);
 
             return $this->response->error($exception->getMessage());
         }
@@ -238,8 +241,10 @@ class HCResourceAuthorController extends HCBaseController
             $restored = $this->service->getRepository()->restore($request->getListIds());
 
             $this->connection->commit();
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $this->connection->rollBack();
+
+            report($exception);
 
             return $this->response->error($exception->getMessage());
         }
@@ -262,8 +267,10 @@ class HCResourceAuthorController extends HCBaseController
             $deleted = $this->service->getRepository()->deleteForce($request->getListIds());
 
             $this->connection->commit();
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $this->connection->rollBack();
+
+            report($exception);
 
             return $this->response->error($exception->getMessage());
         }
