@@ -56,7 +56,7 @@ class HCResourceRequest extends FormRequest
     public function getAuthorId(): ? string
     {
         if ($this->has('author')) {
-            return $this->get('author')['id'];
+            return $this->input('author.id');
         }
 
         return null;
