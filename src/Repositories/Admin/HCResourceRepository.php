@@ -29,10 +29,10 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Repositories\Admin;
 
-use HoneyComb\Core\Repositories\Traits\HCQueryBuilderTrait;
 use HoneyComb\Resources\Models\HCResource;
 use HoneyComb\Resources\Requests\Admin\HCResourceRequest;
 use HoneyComb\Starter\Repositories\HCBaseRepository;
+use HoneyComb\Starter\Repositories\Traits\HCQueryBuilderTrait;
 use Illuminate\Http\UploadedFile;
 
 /**
@@ -79,6 +79,7 @@ class HCResourceRepository extends HCBaseRepository
     /**
      * @param array $ids
      * @return array
+     * @throws \Exception
      */
     public function deleteSoft(array $ids): array
     {
@@ -139,6 +140,7 @@ class HCResourceRepository extends HCBaseRepository
     /**
      * Create data list
      * @param HCResourceRequest $request
+     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection
      */
     public function getOptions(HCResourceRequest $request)
     {

@@ -48,11 +48,6 @@ use Storage;
 class HCResourceService
 {
     /**
-     * Maximum file size to perform checksum calculation
-     */
-    const MAX_CHECKSUM_SIZE = 102400000;
-
-    /**
      * File upload location
      *
      * @var string
@@ -123,20 +118,22 @@ class HCResourceService
             exit;
         }
 
-        if (!Storage::exists($resource->path)) {
+
+        if (!Storage::disk($resource->disk)->exists($resource->path)) {
             logger()->info('File not found in storage', ['id' => $id, 'path' => $resource->path]);
             exit;
         }
 
-        $cachePath = $this->generateResourceCacheLocation($resource->id, $width, $height, $fit) . $resource->extension;
+        $cachePath = $this->generateResourceCacheLocation($resource->id, $width, $height, $fit,
+                $resource->disk) . $resource->extension;
 
+        // TODO interact with disk
         if (file_exists($cachePath)) {
             $resource->size = File::size($cachePath);
             $resource->path = $cachePath;
         } else {
-
             switch ($resource->mime_type) {
-                case 'text/plain' :
+                case 'text/plain':
                     if ($resource->extension == '.svg') {
                         $resource->mime_type = 'image/svg+xml';
                     }
@@ -144,7 +141,7 @@ class HCResourceService
                     $resource->path = $storagePath . $resource->path;
                     break;
 
-                case 'image/svg' :
+                case 'image/svg':
                     if ($resource->mime_type = 'image/svg') {
                         $resource->mime_type = 'image/svg+xml';
                     }
@@ -152,12 +149,10 @@ class HCResourceService
                     $resource->path = $storagePath . $resource->path;
                     break;
 
-                case 'image/jpg' :
-                case 'image/png' :
-                case 'image/jpeg' :
-
+                case 'image/jpg':
+                case 'image/png':
+                case 'image/jpeg':
                     if ($width != 0 && $height != 0) {
-
                         $this->createImage($storagePath . $resource->path, $cachePath, $width, $height, $fit);
 
                         $resource->size = File::size($cachePath);
@@ -167,8 +162,7 @@ class HCResourceService
                     }
                     break;
 
-                case 'video/mp4' :
-
+                case 'video/mp4':
                     $previewPath = str_replace('-', '/', $resource->id);
                     $fullPreviewPath = $storagePath . 'video-previews/' . $previewPath;
 
@@ -179,9 +173,7 @@ class HCResourceService
                         $resource->path = $cachePath;
                         $resource->mime_type = 'image/jpg';
                     } else {
-
                         if ($width != 0 && $height != 0) {
-
                             $videoPreview = $fullPreviewPath . '/preview_frame.jpg';
 
                             //TODO: generate 3-5 previews and take the one with largest size
@@ -199,7 +191,6 @@ class HCResourceService
                     break;
 
                 default:
-
                     $resource->path = $storagePath . $resource->path;
                     break;
             }
@@ -225,28 +216,39 @@ class HCResourceService
      * @param bool $full
      * @param string $id
      * @param \HoneyComb\Resources\Models\HCResource|null $resource
+     * @param string|null $disk
      * @return array
      * @throws \Throwable
      */
-    public function upload(UploadedFile $file, bool $full = null, string $id = null, HCResource $resource = null): array
-    {
+    public function upload(
+        UploadedFile $file,
+        bool $full = null,
+        string $id = null,
+        HCResource $resource = null,
+        string $disk = null
+    ): array {
         if (!$resource) {
             if (is_null($file)) {
                 throw new \Exception(trans('HCResource::resource.error.no_resource_selected'));
             }
 
-            $this->resourceId = $id;
-
             try {
+                if (is_null($disk)) {
+                    $disk = config('filesystems.default');
+                }
+
                 /** @var HCResource $resource */
                 $resource = $this->repository->create(
-                    $this->getFileParams($file)
+                    $this->getFileParams($file, $id, $disk)
                 );
 
-                $this->saveResourceInStorage($resource, $file);
+                $fileName = $resource->id . $this->getExtension($file);
+
+                $this->saveResourceInStorage($fileName, $file, $disk);
 
                 // generate checksum
-                if ($resource['size'] <= config('resources.max_checksum_size', self::MAX_CHECKSUM_SIZE)) {
+                if ($resource['size'] <= config('resources.max_checksum_size')) {
+                    // TODO check with checksum
                     $this->repository->update(
                         [
                             'checksum' => hash_file('sha256', storage_path('app/' . $resource['path'])),
@@ -256,9 +258,8 @@ class HCResourceService
                 }
 
             } catch (\Throwable $exception) {
-
                 if (isset($resource)) {
-                    $this->removeImageFromStorage($resource);
+                    $this->removeImageFromStorage($resource, $disk);
                 }
 
                 throw $exception;
@@ -291,7 +292,6 @@ class HCResourceService
             $resource = $this->repository->find($id);
 
             if ($resource) {
-
                 if ($full) {
                     return $resource->toArray();
                 }
@@ -308,12 +308,11 @@ class HCResourceService
         $fileName = $this->getFileName($source);
 
         if (strlen($fileName)) {
-
             $destination = storage_path('app/uploads/tmp/' . $fileName);
 
             file_put_contents($destination, file_get_contents($source));
 
-            if (filesize($destination) <= config('resources.max_checksum_size', self::MAX_CHECKSUM_SIZE)) {
+            if (filesize($destination) <= config('resources.max_checksum_size')) {
                 $resource = $this->repository->findOneBy(['checksum' => hash_file('sha256', $destination)]);
 
                 if (!$this->allowDuplicates && $resource) {
@@ -351,14 +350,16 @@ class HCResourceService
      * Get file params
      *
      * @param UploadedFile $file
+     * @param string|null $recordId
+     * @param string $disk
      * @return array
      */
-    public function getFileParams(UploadedFile $file)
+    public function getFileParams(UploadedFile $file, string $recordId = null, string $disk)
     {
         $params = [];
 
-        if ($this->resourceId) {
-            $params['id'] = $this->resourceId;
+        if ($recordId) {
+            $params['id'] = $recordId;
         } else {
             $params['id'] = Uuid::uuid4()->toString();
         }
@@ -367,13 +368,15 @@ class HCResourceService
         $extension = $this->getExtension($file);
 
         // TODO add extension to original when original name is not well formed
+        $params['disk'] = $disk;
         $params['original_name'] = $file->getClientOriginalName();
         $params['extension'] = $extension;
         $params['safe_name'] = $params['id'] . $extension;
         $params['path'] = $this->uploadPath . $params['safe_name'];
-        $params['size'] = $file->getClientSize();
+        $params['size'] = $file->getSize();
         $params['mime_type'] = $file->getClientMimeType();
         $params['uploaded_by'] = auth()->check() ? auth()->id() : null;
+        // TODO move lastModified getting to upload method as param
         $params['original_at'] = request()->has('lastModified') ? Carbon::createFromTimestampMs(request()->get('lastModified')) : null;
 
         return $params;
@@ -382,12 +385,22 @@ class HCResourceService
     /**
      * Upload file to server
      *
-     * @param $resource
-     * @param $file
+     * @param HCResource $resource
+     * @param UploadedFile $file
+     * @param string $disk
      */
-    protected function saveResourceInStorage(HCResource $resource, UploadedFile $file): void
+    protected function saveResourceInStorage(string $fileName, UploadedFile $file, string $disk): void
     {
-        $this->createFolder($this->uploadPath);
+//        $this->createFolder($this->uploadPath);
+
+
+        if (Storage::disk($disk)->exists($this->uploadPath . DIRECTORY_SEPARATOR . $fileName)) {
+            return null;
+        }
+
+        $file->store($this->uploadPath . DIRECTORY_SEPARATOR . $fileName, $disk);
+
+        $originalFilePath = Storage::putFileAs($this->uploadPath, $file, $fileName);
 
         $file->move(
             storage_path('app/' . $this->uploadPath),
@@ -399,25 +412,27 @@ class HCResourceService
      * Remove item from storage
      *
      * @param HCResource $resource
+     * @param string $disk
      */
-    protected function removeImageFromStorage(HCResource $resource): void
+    protected function removeImageFromStorage(HCResource $resource, string $disk): void
     {
         $path = $this->uploadPath . $resource->id;
 
-        if (Storage::has($path)) {
-            Storage::delete($path);
+        if (Storage::disk($disk)->has($path)) {
+            Storage::disk($disk)->delete($path);
         }
     }
 
     /**
      * Create folder
      *
-     * @param $path
+     * @param string $path
+     * @param string $disk
      */
-    protected function createFolder(string $path): void
+    protected function createFolder(string $path, string $disk): void
     {
-        if (!Storage::exists($path)) {
-            Storage::makeDirectory($path);
+        if (!Storage::disk($disk)->exists($path)) {
+            Storage::disk($disk)->makeDirectory($path);
         }
     }
 

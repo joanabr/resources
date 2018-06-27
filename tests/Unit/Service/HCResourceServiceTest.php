@@ -25,10 +25,48 @@
  * https://innovationbase.eu
  */
 
-return [
+declare(strict_types = 1);
+
+namespace Tests\Unit\Service;
+
+use HoneyComb\Resources\Repositories\Admin\HCResourceRepository;
+use HoneyComb\Resources\Services\HCResourceService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+/**
+ * Class HCResourceServiceTest
+ * @package Tests\Unit\Service
+ */
+class HCResourceServiceTest extends TestCase
+{
+    use RefreshDatabase;
 
     /**
-     *  Max file size which will generate checksum
+     * @test
+     * @group resource-service
      */
-    'max_checksum_size' => env('MAX_CHECKSUM_SIZE', 102400000),
-];
+    public function it_must_create_singleton_instance(): void
+    {
+        $this->assertInstanceOf(HCResourceService::class, $this->getTestClassInstance());
+
+        $this->assertSame($this->getTestClassInstance(), $this->getTestClassInstance());
+    }
+
+    /**
+     * @test
+     * @group resource-service
+     */
+    public function it_must_get_correct_repository(): void
+    {
+        $this->assertInstanceOf(HCResourceRepository::class, $this->getTestClassInstance()->getRepository());
+    }
+
+    /**
+     * @return HCResourceService
+     */
+    private function getTestClassInstance(): HCResourceService
+    {
+        return $this->app->make(HCResourceService::class);
+    }
+}
