@@ -238,28 +238,27 @@ class HCResourceService
                 }
 
                 /** @var HCResource $resource */
-                $resource = $this->repository->create(
+                $resource = $this->getRepository()->create(
                     $this->getFileParams($file, $id, $disk)
                 );
 
-                $fileName = $resource->id . $this->getExtension($file);
-
-                $this->saveResourceInStorage($fileName, $file, $disk);
+                $this->saveResourceInStorage($resource, $file, $disk);
 
                 // generate checksum
-                if ($resource['size'] <= config('resources.max_checksum_size')) {
-                    // TODO check with checksum
-                    $this->repository->update(
-                        [
-                            'checksum' => hash_file('sha256', storage_path('app/' . $resource['path'])),
-                        ],
-                        $resource->id
+//                if ($resource['size'] <= config('resources.max_checksum_size')) {
+                    $this->getRepository()->updateChecksum(
+                        $resource->id,
+                        $this->getResourcePath($resource['path'], $disk)
                     );
-                }
+//                }
 
             } catch (\Throwable $exception) {
                 if (isset($resource)) {
                     $this->removeImageFromStorage($resource, $disk);
+
+                    if ($resource instanceof HCResource) {
+                        $resource->forceDelete();
+                    }
                 }
 
                 throw $exception;
@@ -289,7 +288,7 @@ class HCResourceService
     public function download(string $source, bool $full = null, string $id = null, string $mime_type = null)
     {
         if ($id) {
-            $resource = $this->repository->find($id);
+            $resource = $this->getRepository()->find($id);
 
             if ($resource) {
                 if ($full) {
@@ -313,7 +312,7 @@ class HCResourceService
             file_put_contents($destination, file_get_contents($source));
 
             if (filesize($destination) <= config('resources.max_checksum_size')) {
-                $resource = $this->repository->findOneBy(['checksum' => hash_file('sha256', $destination)]);
+                $resource = $this->getRepository()->findOneBy(['checksum' => hash_file('sha256', $destination)]);
 
                 if (!$this->allowDuplicates && $resource) {
                     //If duplicate found deleting downloaded file
@@ -373,7 +372,7 @@ class HCResourceService
         $params['extension'] = $extension;
         $params['safe_name'] = $params['id'] . $extension;
         $params['path'] = $this->uploadPath . $params['safe_name'];
-        $params['size'] = $file->getSize();
+        $params['size'] = $file->getClientSize();
         $params['mime_type'] = $file->getClientMimeType();
         $params['uploaded_by'] = auth()->check() ? auth()->id() : null;
         // TODO move lastModified getting to upload method as param
@@ -389,23 +388,17 @@ class HCResourceService
      * @param UploadedFile $file
      * @param string $disk
      */
-    protected function saveResourceInStorage(string $fileName, UploadedFile $file, string $disk): void
+    protected function saveResourceInStorage(HCResource $resource, UploadedFile $file, string $disk): void
     {
-//        $this->createFolder($this->uploadPath);
-
+        $fileName = $resource->id . $this->getExtension($file);
 
         if (Storage::disk($disk)->exists($this->uploadPath . DIRECTORY_SEPARATOR . $fileName)) {
-            return null;
+            logger()->warning('file already exists with this name: ' . $fileName);
+
+            return;
         }
 
-        $file->store($this->uploadPath . DIRECTORY_SEPARATOR . $fileName, $disk);
-
-        $originalFilePath = Storage::putFileAs($this->uploadPath, $file, $fileName);
-
-        $file->move(
-            storage_path('app/' . $this->uploadPath),
-            $resource->id . $this->getExtension($file)
-        );
+        $file->storeAs($this->uploadPath . DIRECTORY_SEPARATOR, $fileName, $disk);
     }
 
     /**
@@ -416,10 +409,8 @@ class HCResourceService
      */
     protected function removeImageFromStorage(HCResource $resource, string $disk): void
     {
-        $path = $this->uploadPath . $resource->id;
-
-        if (Storage::disk($disk)->has($path)) {
-            Storage::disk($disk)->delete($path);
+        if (Storage::disk($disk)->has($resource['path'])) {
+            Storage::disk($disk)->delete($resource['path']);
         }
     }
 
@@ -594,5 +585,19 @@ class HCResourceService
         }
 
         return '.' . $extension;
+    }
+
+    /**
+     * @param string $path - uploads/date/file-name
+     * @param string $disk
+     * @return string
+     */
+    protected function getResourcePath(string $path, string $disk): string
+    {
+        if (config('filesystems.default') == 'local') {
+            return storage_path('app/' . $path);
+        }
+
+        return Storage::disk($disk)->url($path);
     }
 }

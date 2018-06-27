@@ -77,6 +77,15 @@ class HCResourceRepository extends HCBaseRepository
     }
 
     /**
+     * @param string $recordId
+     * @param string $path
+     */
+    public function updateChecksum(string $recordId, string $path): void
+    {
+        $this->update(['checksum' => hash_file('sha256', $path)], $recordId);
+    }
+
+    /**
      * @param array $ids
      * @return array
      * @throws \Exception

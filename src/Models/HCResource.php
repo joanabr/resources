@@ -65,6 +65,7 @@ class HCResource extends HCUuidSoftModel
         'checksum',
         'author_id',
         'original_at',
+        'disk'
     ];
 
     protected $with = [
