@@ -29,9 +29,14 @@ declare(strict_types = 1);
 
 namespace Tests\Unit\Service;
 
+use Carbon\Carbon;
+use HoneyComb\Resources\Models\HCResource;
 use HoneyComb\Resources\Repositories\Admin\HCResourceRepository;
 use HoneyComb\Resources\Services\HCResourceService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Mockery;
 use Tests\TestCase;
 
 /**
@@ -60,6 +65,61 @@ class HCResourceServiceTest extends TestCase
     public function it_must_get_correct_repository(): void
     {
         $this->assertInstanceOf(HCResourceRepository::class, $this->getTestClassInstance()->getRepository());
+    }
+
+    /**
+     * @test
+     * @group resource-service
+     */
+    public function it_must_throw_type_error_exception_if_given_file_is_null(): void
+    {
+        $this->expectException(\TypeError::class);
+
+        $this->getTestClassInstance()->upload(null);
+    }
+
+    /**
+     * @test
+     * @group resource-service
+     */
+    public function it_must_store_jpg_image_file_to_local_storage(): void
+    {
+        \Storage::fake('local');
+
+        $fakeFile = UploadedFile::fake()->image('avatar.jpg');
+        $fakeFileParams = [
+            'id' => '2f2ba74c-3d4a-4eec-9e6f-90a8a9af2785',
+            'disk' => 'local',
+            'original_name' => 'avatar.jpg',
+            'extension' => '.jpg',
+            'safe_name' => '2f2ba74c-3d4a-4eec-9e6f-90a8a9af2785.jpg',
+            'path' => 'uploads/' . Carbon::now()->toDateString() . '/2f2ba74c-3d4a-4eec-9e6f-90a8a9af2785.jpg',
+            'size' => 91,
+            'mime_type' => 'image/jpeg',
+            'uploaded_by' => null,
+            'original_at' => null,
+        ];
+
+        $fakeModel = new HCResource($fakeFileParams);
+
+        $m = Mockery::mock(HCResourceRepository::class);
+        $m->shouldReceive('create')
+            ->once()
+            ->with($fakeFileParams)
+            ->andReturn($fakeModel);
+        $this->app->instance(HCResourceRepository::class, $m);
+
+        $result = $this->getTestClassInstance()->upload(
+            $fakeFile,
+            null,
+            'local',
+            '2f2ba74c-3d4a-4eec-9e6f-90a8a9af2785'
+        );
+
+        // Assert the file was stored...
+        Storage::disk('local')->assertExists($fakeModel->path);
+
+        $this->assertEquals($fakeModel->toArray() + ['storageUrl' => null], $result);
     }
 
     /**

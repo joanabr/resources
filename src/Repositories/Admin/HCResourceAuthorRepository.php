@@ -29,10 +29,10 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Repositories\Admin;
 
-use HoneyComb\Core\Repositories\Traits\HCQueryBuilderTrait;
 use HoneyComb\Resources\Models\HCResourceAuthor;
 use HoneyComb\Resources\Requests\Admin\HCResourceAuthorRequest;
 use HoneyComb\Starter\Repositories\HCBaseRepository;
+use HoneyComb\Starter\Repositories\Traits\HCQueryBuilderTrait;
 
 /**
  * Class HCResourceAuthorRepository

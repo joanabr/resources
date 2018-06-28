@@ -29,9 +29,9 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Repositories\Admin;
 
-use HoneyComb\Core\Repositories\Traits\HCQueryBuilderTrait;
 use HoneyComb\Resources\Models\HCResourceThumbnail;
 use HoneyComb\Starter\Repositories\HCBaseRepository;
+use HoneyComb\Starter\Repositories\Traits\HCQueryBuilderTrait;
 
 /**
  * Class HCResourceThumbnailsRepository
