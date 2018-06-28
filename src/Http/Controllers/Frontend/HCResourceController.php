@@ -36,6 +36,8 @@ use HoneyComb\Resources\Services\HCResourceService;
 use HoneyComb\Starter\Helpers\HCFrontendResponse;
 use Illuminate\Database\Connection;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Class HCResourceController
@@ -78,11 +80,11 @@ class HCResourceController extends HCBaseController
      * @param int|null $width
      * @param int|null $height
      * @param bool|null $fit
-     * @return mixed
+     * @return StreamedResponse
      */
-    public function show(string $id = null, int $width = 0, int $height = 0, bool $fit = false): void
+    public function show(string $id = null, int $width = 0, int $height = 0, bool $fit = false): StreamedResponse
     {
-        $this->service->show($id, $width, $height, $fit);
+        return $this->service->show($id, $width, $height, $fit);
     }
 
     /**
