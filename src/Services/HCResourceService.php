@@ -40,6 +40,7 @@ use Image;
 use Intervention\Image\Constraint;
 use Ramsey\Uuid\Uuid;
 use Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Class HCResourceService
@@ -98,15 +99,14 @@ class HCResourceService
      * @param int $width
      * @param int $height
      * @param bool $fit
+     * @return StreamedResponse
      */
-    public function show(?string $id, int $width, int $height, bool $fit): void
+    public function show(?string $id, int $width, int $height, bool $fit): StreamedResponse
     {
         if (is_null($id)) {
             logger()->info('resourceId is null');
             exit;
         }
-
-        $storagePath = storage_path('app/');
 
         // cache resource for 10 days
         $resource = \Cache::remember($id, 14400, function () use ($id) {
@@ -118,18 +118,23 @@ class HCResourceService
             exit;
         }
 
-
         if (!Storage::disk($resource->disk)->exists($resource->path)) {
             logger()->info('File not found in storage', ['id' => $id, 'path' => $resource->path]);
             exit;
         }
 
-        $cachePath = $this->generateResourceCacheLocation($resource->id, $width, $height, $fit,
-                $resource->disk) . $resource->extension;
+        $cachePath = $this->generateResourceCacheLocation(
+            $resource->id,
+            $resource->disk,
+            $resource->extension,
+            $width,
+            $height,
+            $fit
+        );
 
-        // TODO interact with disk
-        if (file_exists($cachePath)) {
-            $resource->size = File::size($cachePath);
+        if (Storage::disk($resource->disk)->exists($cachePath)) {
+            // cache details
+            $resource->size = Storage::disk($resource->disk)->size($cachePath);
             $resource->path = $cachePath;
         } else {
             switch ($resource->mime_type) {
@@ -138,7 +143,7 @@ class HCResourceService
                         $resource->mime_type = 'image/svg+xml';
                     }
 
-                    $resource->path = $storagePath . $resource->path;
+//                    $resource->path = $storagePath . $resource->path;
                     break;
 
                 case 'image/svg':
@@ -146,27 +151,41 @@ class HCResourceService
                         $resource->mime_type = 'image/svg+xml';
                     }
 
-                    $resource->path = $storagePath . $resource->path;
+//                    $resource->path = $storagePath . $resource->path;
                     break;
 
                 case 'image/jpg':
                 case 'image/png':
                 case 'image/jpeg':
                     if ($width != 0 && $height != 0) {
-                        $this->createImage($storagePath . $resource->path, $cachePath, $width, $height, $fit);
+                        $this->createImage(
+                            $resource->disk,
+                            $resource->path,
+                            $cachePath,
+                            $width,
+                            $height,
+                            $fit
+                        );
 
-                        $resource->size = File::size($cachePath);
+                        $resource->size = Storage::disk($resource->disk)->size($cachePath);
                         $resource->path = $cachePath;
-                    } else {
-                        $resource->path = $storagePath . $resource->path;
                     }
                     break;
 
                 case 'video/mp4':
+                    $storagePath = 'do something with storage path';
+
                     $previewPath = str_replace('-', '/', $resource->id);
                     $fullPreviewPath = $storagePath . 'video-previews/' . $previewPath;
 
-                    $cachePath = $this->generateResourceCacheLocation($previewPath, $width, $height, $fit) . '.jpg';
+                    $cachePath = $this->generateResourceCacheLocation(
+                        $previewPath,
+                        $resource->disk,
+                        '.jpg',
+                        $width,
+                        $height,
+                        $fit
+                    );
 
                     if (file_exists($cachePath)) {
                         $resource->size = File::size($cachePath);
@@ -189,23 +208,20 @@ class HCResourceService
                         }
                     }
                     break;
-
-                default:
-                    $resource->path = $storagePath . $resource->path;
                     break;
             }
         }
 
-        // Show resource
-        header('Pragma: public');
-        header('Cache-Control: max-age=86400');
-        header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 86400));
-        header('Content-Length: ' . $resource->size);
-        header('Content-Disposition: inline;filename="' . $resource->original_name . '"');
-        header('Content-Type: ' . $resource->mime_type);
-        readfile($resource->path);
+        //        header('Pragma: public');
 
-        exit;
+        $headers = [
+            'Content-Type' => $resource->mime_type,
+            'Content-Length' => $resource->size,
+            'Cache-Control' => 'max-age=86400',
+            'Expires' => gmdate('D, d M Y H:i:s \G\M\T', time() + 86400),
+        ];
+
+        return Storage::disk($resource->disk)->response($resource->path, $resource->original_name, $headers);
     }
 
     /**
@@ -245,12 +261,12 @@ class HCResourceService
                 $this->saveResourceInStorage($resource, $file, $disk);
 
                 // generate checksum
-//                if ($resource['size'] <= config('resources.max_checksum_size')) {
+                if ($resource['size'] <= config('resources.max_checksum_size')) {
                     $this->getRepository()->updateChecksum(
                         $resource->id,
                         $this->getResourcePath($resource['path'], $disk)
                     );
-//                }
+                }
 
             } catch (\Throwable $exception) {
                 if (isset($resource)) {
@@ -488,7 +504,6 @@ class HCResourceService
         $videoPreview = $fullPreviewPath . '/preview_frame.jpg';
 
         if (!file_exists($videoPreview)) {
-
             $videoPath = $storagePath . $resource->path;
 
             $ffmpeg = FFMpeg::create([
@@ -512,19 +527,31 @@ class HCResourceService
     /**
      * Generating resource cache location and name
      *
-     * @param $id
+     * @param string $id
+     * @param string $disk
+     * @param string $extension
      * @param int|null $width
      * @param int|null $height
      * @param null $fit
      * @return string
      */
-    private function generateResourceCacheLocation($id, $width = 0, $height = 0, $fit = null): string
-    {
-        $path = storage_path('app/') . 'cache/' . str_replace('-', '/', $id) . '/';
+    private function generateResourceCacheLocation(
+        string $id,
+        string $disk,
+        string $extension,
+        int $width = 0,
+        int $height = 0,
+        $fit = null
+    ): string {
+        if ($disk == 'local') {
+            $folder = config('filesystems.disks.local.root') . '/cache/' . str_replace('-', '/', $id);
 
-        if (!is_dir($path)) {
-            mkdir($path, 0755, true);
+            if (!is_dir($folder)) {
+                mkdir($folder, 0755, true);
+            }
         }
+
+        $path = 'cache/' . str_replace('-', '/', $id) . '/';
 
         $path .= $width . '_' . $height;
 
@@ -532,12 +559,13 @@ class HCResourceService
             $path .= '_fit';
         }
 
-        return $path;
+        return $path . $extension;
     }
 
     /**
      * Creating image based on provided data
      *
+     * @param string $disk
      * @param $source
      * @param $destination
      * @param int $width
@@ -545,7 +573,7 @@ class HCResourceService
      * @param bool $fit
      * @return bool
      */
-    private function createImage($source, $destination, $width = 0, $height = 0, $fit = false): bool
+    private function createImage(string $disk, $source, $destination, $width = 0, $height = 0, $fit = false): bool
     {
         if ($width == 0) {
             $width = null;
@@ -553,6 +581,13 @@ class HCResourceService
 
         if ($height == 0) {
             $height = null;
+        }
+
+        if ($disk == 'local') {
+            $source = config('filesystems.disks.local.root') . DIRECTORY_SEPARATOR . $source;
+            $destination = config('filesystems.disks.local.root') . DIRECTORY_SEPARATOR . $destination;
+        } else {
+            $source = Storage::disk($disk)->url($source);
         }
 
         /** @var \Intervention\Image\Image $image */
@@ -569,7 +604,11 @@ class HCResourceService
             });
         }
 
-        $image->save($destination);
+        if ($disk == 'local') {
+            $image->save($destination);
+        } else {
+            Storage::disk($disk)->put($destination, (string)$image->encode());
+        }
 
         return true;
     }
