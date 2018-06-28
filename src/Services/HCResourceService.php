@@ -444,7 +444,7 @@ class HCResourceService
                     $name = explode('.', $name);
 
                     if (sizeof($name) > 1) {
-                        return implode('.', $name);
+                        return str_slug(implode('.', $name));
                     }
                 }
             }
