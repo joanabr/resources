@@ -29,7 +29,7 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Models;
 
-use HoneyComb\Core\Models\Traits\HCTranslation;
+use HoneyComb\Starter\Models\Traits\HCTranslation;
 use HoneyComb\Starter\Models\HCUuidSoftModel;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
