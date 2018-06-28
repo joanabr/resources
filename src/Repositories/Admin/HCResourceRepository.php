@@ -34,6 +34,7 @@ use HoneyComb\Resources\Requests\Admin\HCResourceRequest;
 use HoneyComb\Starter\Repositories\HCBaseRepository;
 use HoneyComb\Starter\Repositories\Traits\HCQueryBuilderTrait;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Class HCResourceRepository
@@ -77,12 +78,17 @@ class HCResourceRepository extends HCBaseRepository
     }
 
     /**
-     * @param string $recordId
-     * @param string $path
+     * @param HCResource $resource
      */
-    public function updateChecksum(string $recordId, string $path): void
+    public function updateChecksum(HCResource $resource): void
     {
-        $this->update(['checksum' => hash_file('sha256', $path)], $recordId);
+        if ($resource->disk == 'local') {
+            $filePath = config('filesystems.disks.local.root') . DIRECTORY_SEPARATOR . $resource->path;
+        } else {
+            $filePath = Storage::disk($resource->disk)->url($resource->path);
+        }
+
+        $resource->update(['checksum' => hash_file('sha256', $filePath)]);
     }
 
     /**

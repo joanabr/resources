@@ -30,6 +30,7 @@ declare(strict_types = 1);
 namespace HoneyComb\Resources\Requests\Frontend;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Carbon;
 
 /**
  * Class HCResourceRequest
@@ -45,6 +46,16 @@ class HCResourceRequest extends FormRequest
     public function getFile()
     {
         return $this->file('file');
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getLastModified(): ? string
+    {
+        if ($this->has('lastModified')) {
+            return Carbon::createFromTimestampMs($this->input('lastModified'))->toDateTimeString();
+        }
     }
 
     /**

@@ -36,7 +36,6 @@ use HoneyComb\Resources\Services\HCResourceService;
 use HoneyComb\Starter\Helpers\HCFrontendResponse;
 use Illuminate\Database\Connection;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
@@ -99,7 +98,7 @@ class HCResourceController extends HCBaseController
         $this->connection->beginTransaction();
 
         try {
-            $record = $this->service->upload($request->getFile());
+            $record = $this->service->upload($request->getFile(), $request->getLastModified());
 
             $this->connection->commit();
         } catch (\Throwable $exception) {
@@ -112,6 +111,12 @@ class HCResourceController extends HCBaseController
 
         event(new HCResourceCreated($record));
 
-        return $this->response->success('Uploaded', $record);
+        $response = [
+            'id' => $record['id'],
+            'url' => route('resource.get', $record['id']),
+            'storageUrl' => $record['storageUrl'],
+        ];
+
+        return $this->response->success('Uploaded', $response);
     }
 }

@@ -29,7 +29,6 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Services;
 
-use Carbon\Carbon;
 use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
 use File;
@@ -56,21 +55,14 @@ class HCResourceService
     protected $uploadPath;
 
     /**
-     * If uploaded file has predefined ID it will be used
-     *
-     * @var
+     * @var HCResourceRepository
      */
-    protected $resourceId;
+    protected $repository;
 
     /**
      * @var bool
      */
     protected $allowDuplicates;
-
-    /**
-     * @var HCResourceRepository
-     */
-    protected $repository;
 
     /**
      * HCResourceService constructor.
@@ -123,7 +115,7 @@ class HCResourceService
             exit;
         }
 
-        $cachePath = $this->generateResourceCacheLocation(
+        $cachePath = $this->generateCachePath(
             $resource->id,
             $resource->disk,
             $resource->extension,
@@ -133,7 +125,7 @@ class HCResourceService
         );
 
         if (Storage::disk($resource->disk)->exists($cachePath)) {
-            // cache details
+            //set cache details
             $resource->size = Storage::disk($resource->disk)->size($cachePath);
             $resource->path = $cachePath;
         } else {
@@ -142,16 +134,12 @@ class HCResourceService
                     if ($resource->extension == '.svg') {
                         $resource->mime_type = 'image/svg+xml';
                     }
-
-//                    $resource->path = $storagePath . $resource->path;
                     break;
 
                 case 'image/svg':
                     if ($resource->mime_type = 'image/svg') {
                         $resource->mime_type = 'image/svg+xml';
                     }
-
-//                    $resource->path = $storagePath . $resource->path;
                     break;
 
                 case 'image/jpg':
@@ -173,12 +161,12 @@ class HCResourceService
                     break;
 
                 case 'video/mp4':
-                    $storagePath = 'do something with storage path';
+                    $storagePath = '/';
 
                     $previewPath = str_replace('-', '/', $resource->id);
                     $fullPreviewPath = $storagePath . 'video-previews/' . $previewPath;
 
-                    $cachePath = $this->generateResourceCacheLocation(
+                    $cachePath = $this->generateCachePath(
                         $previewPath,
                         $resource->disk,
                         '.jpg',
@@ -187,12 +175,13 @@ class HCResourceService
                         $fit
                     );
 
-                    if (file_exists($cachePath)) {
-                        $resource->size = File::size($cachePath);
+                    if (Storage::disk($resource->disk)->exists($cachePath)) {
+                        $resource->size = Storage::disk($resource->disk)->size($cachePath);
                         $resource->path = $cachePath;
                         $resource->mime_type = 'image/jpg';
                     } else {
                         if ($width != 0 && $height != 0) {
+                            dd('not finished, because of package');
                             $videoPreview = $fullPreviewPath . '/preview_frame.jpg';
 
                             //TODO: generate 3-5 previews and take the one with largest size
@@ -200,7 +189,7 @@ class HCResourceService
 
                             $this->createImage($videoPreview, $cachePath, $width, $height, $fit);
 
-                            $resource->size = File::size($cachePath);
+                            $resource->size = Storage::disk($resource->disk)->size($cachePath);
                             $resource->path = $cachePath;
                             $resource->mime_type = 'image/jpg';
                         } else {
@@ -208,20 +197,16 @@ class HCResourceService
                         }
                     }
                     break;
-                    break;
             }
         }
-
-        //        header('Pragma: public');
 
         $headers = [
             'Content-Type' => $resource->mime_type,
             'Content-Length' => $resource->size,
-            'Cache-Control' => 'max-age=86400',
-            'Expires' => gmdate('D, d M Y H:i:s \G\M\T', time() + 86400),
         ];
 
-        return Storage::disk($resource->disk)->response($resource->path, $resource->original_name, $headers);
+        return Storage::disk($resource->disk)
+            ->response($resource->path, $this->getOriginalFileName($resource), $headers);
     }
 
     /**
@@ -229,66 +214,48 @@ class HCResourceService
      * Catch for errors and if is error throw error
      *
      * @param UploadedFile $file
-     * @param bool $full
-     * @param string $id
-     * @param \HoneyComb\Resources\Models\HCResource|null $resource
+     * @param string|null $lastModified
      * @param string|null $disk
+     * @param string|null $customId
      * @return array
      * @throws \Throwable
      */
     public function upload(
         UploadedFile $file,
-        bool $full = null,
-        string $id = null,
-        HCResource $resource = null,
-        string $disk = null
+        string $lastModified = null,
+        string $disk = null,
+        string $customId = null
     ): array {
-        if (!$resource) {
-            if (is_null($file)) {
-                throw new \Exception(trans('HCResource::resource.error.no_resource_selected'));
+        try {
+            if (is_null($disk)) {
+                $disk = config('filesystems.default');
             }
 
-            try {
-                if (is_null($disk)) {
-                    $disk = config('filesystems.default');
-                }
+            /** @var HCResource $resource */
+            $resource = $this->getRepository()->create(
+                $this->getFileParams($file, $disk, $lastModified, $customId)
+            );
 
-                /** @var HCResource $resource */
-                $resource = $this->getRepository()->create(
-                    $this->getFileParams($file, $id, $disk)
-                );
+            $this->saveInStorage($resource, $file);
 
-                $this->saveResourceInStorage($resource, $file, $disk);
-
-                // generate checksum
-                if ($resource['size'] <= config('resources.max_checksum_size')) {
-                    $this->getRepository()->updateChecksum(
-                        $resource->id,
-                        $this->getResourcePath($resource['path'], $disk)
-                    );
-                }
-
-            } catch (\Throwable $exception) {
-                if (isset($resource)) {
-                    $this->removeImageFromStorage($resource, $disk);
-
-                    if ($resource instanceof HCResource) {
-                        $resource->forceDelete();
-                    }
-                }
-
-                throw $exception;
+            // generate checksum
+            if ($resource->size <= config('resources.max_checksum_size')) {
+                $this->getRepository()->updateChecksum($resource);
             }
+
+        } catch (\Throwable $exception) {
+            if (isset($resource)) {
+                $this->removeResource($disk, $resource);
+            }
+
+            throw $exception;
         }
 
-        if ($full) {
-            return $resource->toArray();
-        }
+        $resource = $resource->toArray();
+        // set storage resource url
+        $resource['storageUrl'] = $this->isLocal($disk) ? null : Storage::disk($disk)->url($resource['path']);
 
-        return [
-            'id' => $resource->id,
-            'url' => route('resource.get', $resource->id),
-        ];
+        return $resource;
     }
 
     /**
@@ -296,15 +263,15 @@ class HCResourceService
      *
      * @param string $source
      * @param bool $full - if set to true than return full resource data
-     * @param string $id
+     * @param string $customId
      * @param null|string $mime_type
      * @return array|mixed|null
      * @throws \Throwable
      */
-    public function download(string $source, bool $full = null, string $id = null, string $mime_type = null)
+    public function download(string $source, bool $full = null, string $customId = null, string $mime_type = null)
     {
-        if ($id) {
-            $resource = $this->getRepository()->find($id);
+        if ($customId) {
+            $resource = $this->getRepository()->find($customId);
 
             if ($resource) {
                 if ($full) {
@@ -355,7 +322,7 @@ class HCResourceService
 
             $file = new UploadedFile($destination, $fileName, $mime_type, filesize($destination), null, true);
 
-            return $this->upload($file, $full, $id);
+            return $this->upload($file, null, $customId);
         }
 
         return null;
@@ -363,18 +330,22 @@ class HCResourceService
 
     /**
      * Get file params
-     *
      * @param UploadedFile $file
-     * @param string|null $recordId
      * @param string $disk
+     * @param string|null $lastModified
+     * @param string|null $customId
      * @return array
      */
-    public function getFileParams(UploadedFile $file, string $recordId = null, string $disk)
-    {
+    public function getFileParams(
+        UploadedFile $file,
+        string $disk,
+        string $lastModified = null,
+        string $customId = null
+    ): array {
         $params = [];
 
-        if ($recordId) {
-            $params['id'] = $recordId;
+        if ($customId) {
+            $params['id'] = $customId;
         } else {
             $params['id'] = Uuid::uuid4()->toString();
         }
@@ -392,7 +363,7 @@ class HCResourceService
         $params['mime_type'] = $file->getClientMimeType();
         $params['uploaded_by'] = auth()->check() ? auth()->id() : null;
         // TODO move lastModified getting to upload method as param
-        $params['original_at'] = request()->has('lastModified') ? Carbon::createFromTimestampMs(request()->get('lastModified')) : null;
+        $params['original_at'] = $lastModified;
 
         return $params;
     }
@@ -402,19 +373,16 @@ class HCResourceService
      *
      * @param HCResource $resource
      * @param UploadedFile $file
-     * @param string $disk
      */
-    protected function saveResourceInStorage(HCResource $resource, UploadedFile $file, string $disk): void
+    protected function saveInStorage(HCResource $resource, UploadedFile $file): void
     {
-        $fileName = $resource->id . $this->getExtension($file);
-
-        if (Storage::disk($disk)->exists($this->uploadPath . DIRECTORY_SEPARATOR . $fileName)) {
-            logger()->warning('file already exists with this name: ' . $fileName);
+        if (Storage::disk($resource->disk)->exists($resource->path)) {
+            logger()->warning('file already exists with this name: ' . $resource->safe_name);
 
             return;
         }
 
-        $file->storeAs($this->uploadPath . DIRECTORY_SEPARATOR, $fileName, $disk);
+        $file->storeAs($this->uploadPath, $resource->safe_name, $resource->disk);
     }
 
     /**
@@ -423,7 +391,7 @@ class HCResourceService
      * @param HCResource $resource
      * @param string $disk
      */
-    protected function removeImageFromStorage(HCResource $resource, string $disk): void
+    protected function removeResourceFromStorage(HCResource $resource, string $disk): void
     {
         if (Storage::disk($disk)->has($resource['path'])) {
             Storage::disk($disk)->delete($resource['path']);
@@ -489,11 +457,11 @@ class HCResourceService
     /**
      * generating video preview
      *
-     * @param HCResources $resource
+     * @param HCResource $resource
      * @param string $storagePath
      * @param string $previewPath
      */
-    private function generateVideoPreview(HCResources $resource, string $storagePath, string $previewPath): void
+    private function generateVideoPreview(HCResource $resource, string $storagePath, string $previewPath): void
     {
         $fullPreviewPath = $storagePath . 'video-previews/' . $previewPath;
 
@@ -527,7 +495,7 @@ class HCResourceService
     /**
      * Generating resource cache location and name
      *
-     * @param string $id
+     * @param string $resourceId
      * @param string $disk
      * @param string $extension
      * @param int|null $width
@@ -535,23 +503,23 @@ class HCResourceService
      * @param null $fit
      * @return string
      */
-    private function generateResourceCacheLocation(
-        string $id,
+    private function generateCachePath(
+        string $resourceId,
         string $disk,
         string $extension,
         int $width = 0,
         int $height = 0,
         $fit = null
     ): string {
-        if ($disk == 'local') {
-            $folder = config('filesystems.disks.local.root') . '/cache/' . str_replace('-', '/', $id);
+        if ($this->isLocal($disk)) {
+            $folder = config('filesystems.disks.local.root') . '/cache/' . str_replace('-', '/', $resourceId);
 
             if (!is_dir($folder)) {
                 mkdir($folder, 0755, true);
             }
         }
 
-        $path = 'cache/' . str_replace('-', '/', $id) . '/';
+        $path = 'cache/' . str_replace('-', '/', $resourceId) . '/';
 
         $path .= $width . '_' . $height;
 
@@ -583,7 +551,7 @@ class HCResourceService
             $height = null;
         }
 
-        if ($disk == 'local') {
+        if ($this->isLocal($disk)) {
             $source = config('filesystems.disks.local.root') . DIRECTORY_SEPARATOR . $source;
             $destination = config('filesystems.disks.local.root') . DIRECTORY_SEPARATOR . $destination;
         } else {
@@ -604,7 +572,7 @@ class HCResourceService
             });
         }
 
-        if ($disk == 'local') {
+        if ($this->isLocal($disk)) {
             $image->save($destination);
         } else {
             Storage::disk($disk)->put($destination, (string)$image->encode());
@@ -633,10 +601,43 @@ class HCResourceService
      */
     protected function getResourcePath(string $path, string $disk): string
     {
-        if (config('filesystems.default') == 'local') {
-            return storage_path('app/' . $path);
+        if ($this->isLocal($disk)) {
+            return config('filesystems.disks.local.root') . DIRECTORY_SEPARATOR . $path;
         }
 
         return Storage::disk($disk)->url($path);
+    }
+
+    /**
+     * @param string $disk
+     * @return bool
+     */
+    private function isLocal(string $disk): bool
+    {
+        return $disk == 'local';
+    }
+
+    /**
+     * @param string $disk
+     * @param $resource
+     */
+    private function removeResource(string $disk, $resource): void
+    {
+        $this->removeResourceFromStorage($resource, $disk);
+
+        if ($resource instanceof HCResource) {
+            $resource->forceDelete();
+        }
+    }
+
+    /**
+     * @param $resource
+     * @return string
+     */
+    private function getOriginalFileName($resource): string
+    {
+        $name = str_replace($resource->extension, '', $resource->original_name);
+
+        return str_slug($name) . $resource->extension;
     }
 }
