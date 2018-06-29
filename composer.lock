@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
     "content-hash": "48917a3cb19b2eb29a3245dc645091de",
@@ -462,16 +462,16 @@
         },
         {
             "name": "honey-comb/starter",
-            "version": "0.2.10",
+            "version": "0.2.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/honey-comb/starter.git",
-                "reference": "96b7a8a99c5fbc6fabbd8db70337b68a6fd83cab"
+                "reference": "d92a92ba60ce81bd7d84eb659e30878fbf7807a3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/honey-comb/starter/zipball/96b7a8a99c5fbc6fabbd8db70337b68a6fd83cab",
-                "reference": "96b7a8a99c5fbc6fabbd8db70337b68a6fd83cab",
+                "url": "https://api.github.com/repos/honey-comb/starter/zipball/d92a92ba60ce81bd7d84eb659e30878fbf7807a3",
+                "reference": "d92a92ba60ce81bd7d84eb659e30878fbf7807a3",
                 "shasum": ""
             },
             "require": {
@@ -529,7 +529,7 @@
                 "laravel",
                 "starter"
             ],
-            "time": "2018-06-27T11:12:10+00:00"
+            "time": "2018-06-28T12:14:58+00:00"
         },
         {
             "name": "intervention/image",
