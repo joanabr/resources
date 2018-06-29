@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2018 interactivesolutions
+ * @copyright 2018 innovationbase
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,25 +20,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * Contact InteractiveSolutions:
- * E-mail: hello@interactivesolutions.lt
- * http://www.interactivesolutions.lt
+ * Contact InnovationBase:
+ * E-mail: hello@innovationbase.eu
+ * https://innovationbase.eu
  */
 
 declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Services;
 
-use FFMpeg\Coordinate\TimeCode;
-use FFMpeg\FFMpeg;
-use File;
 use HoneyComb\Resources\Models\HCResource;
 use HoneyComb\Resources\Repositories\Admin\HCResourceRepository;
 use Illuminate\Http\UploadedFile;
-use Image;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Constraint;
+use Intervention\Image\Facades\Image;
 use Ramsey\Uuid\Uuid;
-use Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
@@ -60,6 +58,8 @@ class HCResourceService
     protected $repository;
 
     /**
+     * Should the checksum be validated and duplicates found
+     *
      * @var bool
      */
     protected $allowDuplicates;
@@ -68,14 +68,12 @@ class HCResourceService
      * HCResourceService constructor.
      *
      * @param HCResourceRepository $repository
-     * @param bool $allowDuplicates - should the checksum be validated and duplicates found
      */
-    public function __construct(HCResourceRepository $repository, bool $allowDuplicates = false)
+    public function __construct(HCResourceRepository $repository)
     {
-        $this->allowDuplicates = $allowDuplicates;
-
-        $this->uploadPath = 'uploads/' . date("Y-m-d") . DIRECTORY_SEPARATOR;
         $this->repository = $repository;
+
+        $this->uploadPath = sprintf('uploads/%s/', date('Y-m-d'));
     }
 
     /**
@@ -84,6 +82,17 @@ class HCResourceService
     public function getRepository(): HCResourceRepository
     {
         return $this->repository;
+    }
+
+    /**
+     * @param bool $allow
+     * @return HCResourceService
+     */
+    public function setAllowDuplicates(bool $allow): HCResourceService
+    {
+        $this->allowDuplicates = $allow;
+
+        return $this;
     }
 
     /**
@@ -101,8 +110,8 @@ class HCResourceService
         }
 
         // cache resource for 10 days
-        $resource = \Cache::remember($id, 14400, function () use ($id) {
-            return HCResource::find($id);
+        $resource = Cache::remember($id, 60 * 24 * 10, function () use ($id) {
+            return $this->getRepository()->find($id);
         });
 
         if (!$resource) {
@@ -164,7 +173,7 @@ class HCResourceService
                     $storagePath = '/';
 
                     $previewPath = str_replace('-', '/', $resource->id);
-                    $fullPreviewPath = $storagePath . 'video-previews/' . $previewPath;
+//                    $fullPreviewPath = $storagePath . 'video-previews/' . $previewPath;
 
                     $cachePath = $this->generateCachePath(
                         $previewPath,
@@ -182,16 +191,16 @@ class HCResourceService
                     } else {
                         if ($width != 0 && $height != 0) {
                             dd('not finished, because of package');
-                            $videoPreview = $fullPreviewPath . '/preview_frame.jpg';
-
-                            //TODO: generate 3-5 previews and take the one with largest size
-                            $this->generateVideoPreview($resource, $storagePath, $previewPath);
-
-                            $this->createImage($videoPreview, $cachePath, $width, $height, $fit);
-
-                            $resource->size = Storage::disk($resource->disk)->size($cachePath);
-                            $resource->path = $cachePath;
-                            $resource->mime_type = 'image/jpg';
+//                            $videoPreview = $fullPreviewPath . '/preview_frame.jpg';
+//
+//                            //TODO: generate 3-5 previews and take the one with largest size
+//                            $this->generateVideoPreview($resource, $storagePath, $previewPath);
+//
+//                            $this->createImage($videoPreview, $cachePath, $width, $height, $fit);
+//
+//                            $resource->size = Storage::disk($resource->disk)->size($cachePath);
+//                            $resource->path = $cachePath;
+//                            $resource->mime_type = 'image/jpg';
                         } else {
                             $resource->path = $storagePath . $resource->path;
                         }
@@ -242,7 +251,6 @@ class HCResourceService
             if ($resource->size <= config('resources.max_checksum_size')) {
                 $this->getRepository()->updateChecksum($resource);
             }
-
         } catch (\Throwable $exception) {
             if (isset($resource)) {
                 $this->removeResource($disk, $resource);
@@ -262,70 +270,59 @@ class HCResourceService
      * Downloading and storing image in the system
      *
      * @param string $source
-     * @param bool $full - if set to true than return full resource data
-     * @param string $customId
-     * @param null|string $mime_type
-     * @return array|mixed|null
+     * @param string|null $disk
+     * @param string|null $customId
+     * @param string|null $mimeType
+     * @return array|null
      * @throws \Throwable
      */
-    public function download(string $source, bool $full = null, string $customId = null, string $mime_type = null)
-    {
+    public function download(
+        string $source,
+        string $disk = null,
+        string $customId = null,
+        string $mimeType = null
+    ): ? array {
+        // TODO maybe we should add exceptions instead of returning null values?
         if ($customId) {
-            $resource = $this->getRepository()->find($customId);
-
-            if ($resource) {
-                if ($full) {
-                    return $resource->toArray();
-                }
-
-                return [
-                    'id' => $resource->id,
-                    'url' => route('resource.get', $resource->id),
-                ];
+            if ($resource = $this->getRepository()->find($customId)) {
+                return $resource->toArray();
             }
         }
-
-        $this->createFolder('uploads/tmp');
 
         $fileName = $this->getFileName($source);
 
-        if (strlen($fileName)) {
-            $destination = storage_path('app/uploads/tmp/' . $fileName);
-
-            file_put_contents($destination, file_get_contents($source));
-
-            if (filesize($destination) <= config('resources.max_checksum_size')) {
-                $resource = $this->getRepository()->findOneBy(['checksum' => hash_file('sha256', $destination)]);
-
-                if (!$this->allowDuplicates && $resource) {
-                    //If duplicate found deleting downloaded file
-                    \File::delete($destination);
-
-                    if ($full) {
-                        return $resource->toArray();
-                    }
-
-                    return [
-                        'id' => $resource->id,
-                        'url' => route('resource.get', $resource->id),
-                    ];
-                }
-            }
-
-            if (!\File::exists($destination)) {
-                return null;
-            }
-
-            if (!$mime_type) {
-                $mime_type = mime_content_type($destination);
-            }
-
-            $file = new UploadedFile($destination, $fileName, $mime_type, filesize($destination), null, true);
-
-            return $this->upload($file, null, $customId);
+        if (!strlen($fileName)) {
+            return null;
         }
 
-        return null;
+        $this->createFolder('uploads/tmp', 'local');
+
+        $destination = storage_path('app/uploads/tmp/' . $fileName);
+
+        file_put_contents($destination, file_get_contents($source));
+
+        if (filesize($destination) <= config('resources.max_checksum_size')) {
+            $resource = $this->getRepository()->findOneBy(['checksum' => hash_file('sha256', $destination)]);
+
+            if (!$this->allowDuplicates && $resource) {
+                //If duplicate found deleting downloaded file
+                unlink($destination);
+
+                return $resource->toArray();
+            }
+        }
+
+        if (!file_exists($destination)) {
+            return null;
+        }
+
+        if (!$mimeType) {
+            $mimeType = mime_content_type($destination);
+        }
+
+        $file = new UploadedFile($destination, $fileName, $mimeType, filesize($destination), null, true);
+
+        return $this->upload($file, null, $disk, $customId);
     }
 
     /**
@@ -359,7 +356,7 @@ class HCResourceService
         $params['extension'] = $extension;
         $params['safe_name'] = $params['id'] . $extension;
         $params['path'] = $this->uploadPath . $params['safe_name'];
-        $params['size'] = $file->getClientSize();
+        $params['size'] = $file->getSize();
         $params['mime_type'] = $file->getClientMimeType();
         $params['uploaded_by'] = auth()->check() ? auth()->id() : null;
         // TODO move lastModified getting to upload method as param
@@ -446,11 +443,12 @@ class HCResourceService
         $explodedByParams = explode('?', $fileName);
         $fileName = head($explodedByParams);
 
+        $string = sanitizeString(pathinfo($fileName, PATHINFO_FILENAME));
+
         if (strpos($fileName, '.') !== false && substr($fileName, -3) != 'php') {
-            return sanitizeString(pathinfo($fileName, PATHINFO_FILENAME)) . '.' . pathinfo($fileName,
-                    PATHINFO_EXTENSION);
+            return $string . '.' . pathinfo($fileName, PATHINFO_EXTENSION);
         } else {
-            return sanitizeString(pathinfo($fileName, PATHINFO_FILENAME));
+            return $string;
         }
     }
 
@@ -461,35 +459,35 @@ class HCResourceService
      * @param string $storagePath
      * @param string $previewPath
      */
-    private function generateVideoPreview(HCResource $resource, string $storagePath, string $previewPath): void
+    protected function generateVideoPreview(HCResource $resource, string $storagePath, string $previewPath): void
     {
-        $fullPreviewPath = $storagePath . 'video-previews/' . $previewPath;
-
-        if (!file_exists($fullPreviewPath)) {
-            mkdir($fullPreviewPath, 0755, true);
-        }
-
-        $videoPreview = $fullPreviewPath . '/preview_frame.jpg';
-
-        if (!file_exists($videoPreview)) {
-            $videoPath = $storagePath . $resource->path;
-
-            $ffmpeg = FFMpeg::create([
-                'ffmpeg.binaries' => '/usr/bin/ffmpeg',
-                'ffprobe.binaries' => '/usr/bin/ffprobe',
-                'timeout' => 3600, // The timeout for the underlying process
-                'ffmpeg.threads' => 12,   // The number of threads that FFMpeg should use
-            ]);
-
-            $video = $ffmpeg->open($storagePath . $resource->path);
-            $duration = $video->getFFProbe()->format($videoPath)->get('duration');
-
-            $video->frame(TimeCode::fromSeconds(rand(1, $duration)))
-                ->save($videoPreview);
-
-            $resource->mime_type = 'image/jpg';
-            $resource->path = $videoPreview;
-        }
+//        $fullPreviewPath = $storagePath . 'video-previews/' . $previewPath;
+//
+//        if (!file_exists($fullPreviewPath)) {
+//            mkdir($fullPreviewPath, 0755, true);
+//        }
+//
+//        $videoPreview = $fullPreviewPath . '/preview_frame.jpg';
+//
+//        if (!file_exists($videoPreview)) {
+//            $videoPath = $storagePath . $resource->path;
+//
+//            $ffmpeg = FFMpeg::create([
+//                'ffmpeg.binaries' => '/usr/bin/ffmpeg',
+//                'ffprobe.binaries' => '/usr/bin/ffprobe',
+//                'timeout' => 3600, // The timeout for the underlying process
+//                'ffmpeg.threads' => 12,   // The number of threads that FFMpeg should use
+//            ]);
+//
+//            $video = $ffmpeg->open($storagePath . $resource->path);
+//            $duration = $video->getFFProbe()->format($videoPath)->get('duration');
+//
+//            $video->frame(TimeCode::fromSeconds(rand(1, $duration)))
+//                ->save($videoPreview);
+//
+//            $resource->mime_type = 'image/jpg';
+//            $resource->path = $videoPreview;
+//        }
     }
 
     /**
@@ -503,7 +501,7 @@ class HCResourceService
      * @param null $fit
      * @return string
      */
-    private function generateCachePath(
+    protected function generateCachePath(
         string $resourceId,
         string $disk,
         string $extension,
@@ -541,7 +539,7 @@ class HCResourceService
      * @param bool $fit
      * @return bool
      */
-    private function createImage(string $disk, $source, $destination, $width = 0, $height = 0, $fit = false): bool
+    protected function createImage(string $disk, $source, $destination, $width = 0, $height = 0, $fit = false): bool
     {
         if ($width == 0) {
             $width = null;
@@ -585,7 +583,7 @@ class HCResourceService
      * @param UploadedFile $file
      * @return string
      */
-    private function getExtension(UploadedFile $file): string
+    protected function getExtension(UploadedFile $file): string
     {
         if (!$extension = $file->getClientOriginalExtension()) {
             $extension = explode('/', $file->getClientMimeType())[1];
@@ -612,7 +610,7 @@ class HCResourceService
      * @param string $disk
      * @return bool
      */
-    private function isLocal(string $disk): bool
+    protected function isLocal(string $disk): bool
     {
         return $disk == 'local';
     }
@@ -621,7 +619,7 @@ class HCResourceService
      * @param string $disk
      * @param $resource
      */
-    private function removeResource(string $disk, $resource): void
+    protected function removeResource(string $disk, $resource): void
     {
         $this->removeResourceFromStorage($resource, $disk);
 
@@ -634,7 +632,7 @@ class HCResourceService
      * @param $resource
      * @return string
      */
-    private function getOriginalFileName($resource): string
+    protected function getOriginalFileName($resource): string
     {
         $name = str_replace($resource->extension, '', $resource->original_name);
 
