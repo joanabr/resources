@@ -1,4 +1,4 @@
-# honeycomb-resources  
+# honeycomb-resources [![Build Status](https://travis-ci.org/honey-comb/resources.svg?branch=master)](https://travis-ci.org/honey-comb/resources)  
 https://github.com/honey-comb/resources
 
 ## Description
