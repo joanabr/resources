@@ -94,7 +94,7 @@ class HCResourceServiceTest extends TestCase
             'extension' => '.jpg',
             'safe_name' => '2f2ba74c-3d4a-4eec-9e6f-90a8a9af2785.jpg',
             'path' => 'uploads/' . Carbon::now()->toDateString() . '/2f2ba74c-3d4a-4eec-9e6f-90a8a9af2785.jpg',
-            'size' => 91,
+            'size' => $fakeFile->getSize(),
             'mime_type' => 'image/jpeg',
             'uploaded_by' => null,
             'original_at' => null,
