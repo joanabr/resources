@@ -29,6 +29,7 @@ declare(strict_types = 1);
 
 namespace Tests\Unit\Service;
 
+use Carbon\Carbon;
 use HoneyComb\Resources\Models\HCResource;
 use HoneyComb\Resources\Repositories\Admin\HCResourceRepository;
 use HoneyComb\Resources\Services\HCResourceService;
@@ -92,7 +93,7 @@ class HCResourceServiceTest extends TestCase
             'original_name' => 'avatar.jpg',
             'extension' => '.jpg',
             'safe_name' => '2f2ba74c-3d4a-4eec-9e6f-90a8a9af2785.jpg',
-            'path' => 'uploads/2018-06-28/2f2ba74c-3d4a-4eec-9e6f-90a8a9af2785.jpg',
+            'path' => 'uploads/' . Carbon::now()->toDateString() . '/2f2ba74c-3d4a-4eec-9e6f-90a8a9af2785.jpg',
             'size' => 91,
             'mime_type' => 'image/jpeg',
             'uploaded_by' => null,
