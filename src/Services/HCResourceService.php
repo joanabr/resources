@@ -38,6 +38,7 @@ use Intervention\Image\Constraint;
 use Intervention\Image\Facades\Image;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Throwable;
 
 /**
  * Class HCResourceService
@@ -63,6 +64,13 @@ class HCResourceService
      * @var bool
      */
     protected $allowDuplicates;
+
+    /**
+     * Amount of attempts for file headers loading, to be able to repeat the call
+     *
+     * @var int
+     */
+    protected $headerCallAttempts = 0;
 
     /**
      * HCResourceService constructor.
@@ -110,7 +118,7 @@ class HCResourceService
         }
 
         // cache resource for 10 days
-        $resource = Cache::remember($id, 60 * 24 * 10, function () use ($id) {
+        $resource = Cache::remember($id, 60 * 24 * 10, function() use ($id) {
             return $this->getRepository()->find($id);
         });
 
@@ -281,7 +289,7 @@ class HCResourceService
         string $disk = null,
         string $customId = null,
         string $mimeType = null
-    ): ? array {
+    ): ?array {
         // TODO maybe we should add exceptions instead of returning null values?
         if ($customId) {
             if ($resource = $this->getRepository()->find($customId)) {
@@ -413,15 +421,32 @@ class HCResourceService
      *
      * @param $fileName
      * @return null|string
+     * @throws \Throwable
      */
-    protected function getFileName(string $fileName): ? string
+    protected function getFileName(string $fileName): ?string
     {
         if (!$fileName) {
             return null;
         }
 
         if (filter_var($fileName, FILTER_VALIDATE_URL)) {
-            $headers = (get_headers($fileName));
+
+            try {
+                $headers = (get_headers($fileName));
+            } catch (Throwable $exception) {
+                report($exception);
+                sleep(1);
+
+                if ($this->headerCallAttempts < 5) {
+
+                    $this->headerCallAttempts++;
+                    return $this->getFileName($fileName);
+                }
+
+                throw $exception;
+            }
+
+            $this->headerCallAttempts = 0;
 
             foreach ($headers as $header) {
                 if (strpos($header, 'filename')) {
@@ -560,11 +585,11 @@ class HCResourceService
         $image = Image::make($source);
 
         if ($fit) {
-            $image->fit($width, $height, function (Constraint $constraint) {
+            $image->fit($width, $height, function(Constraint $constraint) {
                 $constraint->upsize();
             });
         } else {
-            $image->resize($width, $height, function (Constraint $constraint) {
+            $image->resize($width, $height, function(Constraint $constraint) {
                 $constraint->upsize();
                 $constraint->aspectRatio();
             });
