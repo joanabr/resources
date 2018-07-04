@@ -29,11 +29,12 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Repositories\Admin;
 
-use HoneyComb\Core\Repositories\Traits\HCQueryBuilderTrait;
 use HoneyComb\Resources\Models\HCResource;
 use HoneyComb\Resources\Requests\Admin\HCResourceRequest;
 use HoneyComb\Starter\Repositories\HCBaseRepository;
+use HoneyComb\Starter\Repositories\Traits\HCQueryBuilderTrait;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Class HCResourceRepository
@@ -77,8 +78,23 @@ class HCResourceRepository extends HCBaseRepository
     }
 
     /**
+     * @param HCResource $resource
+     */
+    public function updateChecksum(HCResource $resource): void
+    {
+        if ($resource->disk == 'local') {
+            $filePath = config('filesystems.disks.local.root') . DIRECTORY_SEPARATOR . $resource->path;
+        } else {
+            $filePath = Storage::disk($resource->disk)->url($resource->path);
+        }
+
+        $resource->update(['checksum' => hash_file('sha256', $filePath)]);
+    }
+
+    /**
      * @param array $ids
      * @return array
+     * @throws \Exception
      */
     public function deleteSoft(array $ids): array
     {
@@ -139,6 +155,7 @@ class HCResourceRepository extends HCBaseRepository
     /**
      * Create data list
      * @param HCResourceRequest $request
+     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection
      */
     public function getOptions(HCResourceRequest $request)
     {

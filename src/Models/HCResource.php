@@ -29,8 +29,8 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Models;
 
-use HoneyComb\Core\Models\Traits\HCTranslation;
 use HoneyComb\Starter\Models\HCUuidSoftModel;
+use HoneyComb\Starter\Models\Traits\HCTranslation;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
@@ -65,6 +65,7 @@ class HCResource extends HCUuidSoftModel
         'checksum',
         'author_id',
         'original_at',
+        'disk',
     ];
 
     protected $with = [
