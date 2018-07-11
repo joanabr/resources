@@ -30,6 +30,7 @@ declare(strict_types = 1);
 namespace HoneyComb\Resources\Repositories\Admin;
 
 use HoneyComb\Resources\Models\HCResource;
+use HoneyComb\Resources\Models\HCResourceTranslation;
 use HoneyComb\Resources\Requests\Admin\HCResourceRequest;
 use HoneyComb\Starter\Repositories\HCBaseRepository;
 use HoneyComb\Starter\Repositories\Traits\HCQueryBuilderTrait;
@@ -50,6 +51,14 @@ class HCResourceRepository extends HCBaseRepository
     public function model(): string
     {
         return HCResource::class;
+    }
+    
+    /**
+     * @return null|string
+     */
+    protected function translationModel(): ? string
+    {
+        return HCResourceTranslation::class;
     }
 
     /**
