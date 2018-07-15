@@ -6,8 +6,9 @@
     },
     "formData": {
         "resource.author": "HoneyComb\\Resources\\Forms\\Admin\\HCResourceAuthorForm",
+        "resource.thumb": "HoneyComb\\Resources\\Forms\\HCResourceThumbForm",
         "resource": "HoneyComb\\Resources\\Forms\\Admin\\HCResourceForm",
-        "resource.thumb": "HoneyComb\\Resources\\Forms\\HCResourceThumbForm"
+        "resource.grab-editor": "HoneyComb\\Resources\\Forms\\Admin\\HCResourceGrabPropertyForm"
     },
     "adminMenu": [
         {
@@ -30,6 +31,13 @@
             "translation": "HCResource::resource_thumb.page_title",
             "icon": "object-ungroup",
             "aclPermission": "honey_comb_resources_resource_thumb_list"
+        },
+        {
+            "route": "admin.resource.grab.property.index",
+            "parent": "admin.resource.index",
+            "translation": "HCResource::resource_grab_property.page_title",
+            "icon": "object-ungroup",
+            "aclPermission": "honey_comb_resources_resource_grab_property_list"
         }
     ],
     "seeder": "",
@@ -37,6 +45,7 @@
         "Routes\/Frontend\/routes.resources.php",
         "Routes\/Admin\/routes.resource.authors.php",
         "Routes\/Admin\/routes.resource.thumb.php",
+        "Routes\/Admin\/routes.resource.grab.property.php",
         "Routes\/Admin\/routes.resource.php"
     ],
     "acl": {
@@ -70,6 +79,16 @@
                 "actions": [
                     "honey_comb_resources_resource_thumb_update",
                     "honey_comb_resources_resource_thumb_list"
+                ]
+            },
+            {
+                "name": "acl.resource.grab.property",
+                "controller": "HoneyComb\\Resources\\Http\\Controllers\\Admin\\HCResourceGrabPropertyController",
+                "actions": [
+                    "honey_comb_resources_resource_grab_property_update",
+                    "honey_comb_resources_resource_grab_property_create",
+                    "honey_comb_resources_resource_grab_property_delete",
+                    "honey_comb_resources_resource_grab_property_list"
                 ]
             }
         ]

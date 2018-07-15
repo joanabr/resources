@@ -27,45 +27,25 @@
 
 declare(strict_types = 1);
 
-namespace HoneyComb\Resources\Models;
+Route::domain(config('hc.admin_domain'))
+    ->prefix(config('hc.admin_url'))
+    ->namespace('Admin')
+    ->middleware(['web', 'auth'])
+    ->group(function() {
 
-use HoneyComb\Starter\Models\HCUuidModel;
+        Route::get('resource/grab-property', 'HCResourceGrabPropertyController@index')
+            ->name('admin.resource.grab.property.index')
+            ->middleware('acl:honey_comb_resources_resource_grab_property_admin_list');
 
+        Route::prefix('api/resource/grab-property')->group(function() {
 
-/**
- * Class HCResourceGrabProperty
- * @package HoneyComb\Resources\Models
- */
-class HCResourceGrabProperty extends HCUuidModel
-{
-    /**
-     * The database table used by the model.
-     *
-     * @var string
-     */
-    protected $table = 'hc_resource_grab_property';
+            Route::get('/', 'HCResourceGrabPropertyController@getListPaginate')
+                ->name('admin.api.resource.grab.property')
+                ->middleware('acl:honey_comb_resources_resource_grab_property_admin_list');
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        "id",
-        "thumbnail_id",
-        "resource_id",
-        "source_id",
-        "source_type",
-        "x",
-        "y",
-        "zoom",
-    ];
+            Route::post('/', 'HCResourceGrabPropertyController@store')
+                ->name('admin.api.resource.grab.property.create')
+                ->middleware('acl:honey_comb_resources_resource_grab_property_admin_create');
 
-    /**
-     * @var array
-     */
-    protected $with = [
-
-    ];
-
-}
+        });
+    });

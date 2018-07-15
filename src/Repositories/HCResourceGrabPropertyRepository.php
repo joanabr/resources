@@ -20,4 +20,18 @@ class HCResourceGrabPropertyRepository extends HCBaseRepository
         return HCResourceGrabProperty::class;
     }
 
+    /**
+     * @param string $sourceType
+     * @param string $sourceId
+     * @param string $resourceId
+     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
+     */
+    public function getGrabbed(string $sourceType, string $sourceId, string $resourceId)
+    {
+        return $this->makeQuery()
+            ->where('source_type', $sourceType)
+            ->where('source_id', $sourceId)
+            ->where('resource_id', $resourceId)->get();
+    }
+
 }

@@ -27,12 +27,7 @@ class HCResourceThumbRepository extends HCBaseRepository
      */
     public function getOptions(HCResourceThumbRequest $request)
     {
-        return $this->createBuilderQuery($request)->get()->map(function ($record) {
-            return [
-                'id' => $record->id,
-                'name' => $record->id,
-            ];
-        });
+        return $this->createBuilderQuery($request)->where('grab_enabled', '1')->get();
     }
 
 
