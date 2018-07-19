@@ -7,7 +7,6 @@ namespace HoneyComb\Resources\Services\Admin;
 use HoneyComb\Resources\Repositories\Admin\HCResourceGrabPropertyRepository;
 use HoneyComb\Resources\Services\HCResourceService;
 use HoneyComb\Resources\Services\HCResourceThumbService;
-use Intervention\Image\Constraint;
 use Intervention\Image\Facades\Image;
 
 class HCResourceGrabPropertyService
@@ -54,8 +53,6 @@ class HCResourceGrabPropertyService
      */
     public function generateThumbs(array $images)
     {
-        //TODO:
-
         foreach ($images as $image) {
 
             $searchArray = [
@@ -74,8 +71,7 @@ class HCResourceGrabPropertyService
 
             } elseif ($record->x == $image['x'] && $record->y === $image['y']) {
                 continue;
-            } else
-            {
+            } else {
                 $this->generateThumbnail($image);
                 $this->repository->updateOrCreate($searchArray, $image);
             }
@@ -117,6 +113,11 @@ class HCResourceGrabPropertyService
 
             $width = (integer)($thumbnail->width * $scale);
             $height = (integer)($thumbnail->height * $scale);
+        }
+
+        if ($data['x'] == null && $data['y'] == null) {
+            $data['x'] = -($thumbnail->width - $image->width() / $scale) * 0.5;
+            $data['y'] = -($thumbnail->height - $image->height() / $scale) * 0.5;
         }
 
         $image->crop($width, $height, abs((integer)($data['x'] * $scale)), abs((integer)($data['y'] * $scale)));
