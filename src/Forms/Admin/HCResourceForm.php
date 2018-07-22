@@ -53,13 +53,16 @@ class HCResourceForm extends HCBaseForm
     {
         $form = [
             'storageUrl' => route('admin.api.resource'),
-            'buttons' => [
+            'structure' => $this->getStructure($edit),
+        ];
+
+        if ($edit) {
+            $form['buttons'] = [
                 'submit' => [
                     'label' => $this->getSubmitLabel($edit),
                 ],
-            ],
-            'structure' => $this->getStructure($edit),
-        ];
+            ];
+        }
 
         if ($this->multiLanguage) {
             $form['availableLanguages'] = getHCContentLanguages();
@@ -74,7 +77,19 @@ class HCResourceForm extends HCBaseForm
      */
     public function getStructureNew(string $prefix): array
     {
-        return [];
+        return [
+            $prefix . 'media' =>
+                [
+                    'tab' => trans('HCResource::resource.resource'),
+                    'type' => 'media',
+                    'viewUrl' => route('resource.get', '/'),
+                    'uploadUrl' => route('resource.upload'),
+                    'editUrl' => route('admin.api.form-manager', ['resource-edit']),
+                    'hideDelete' => 1,
+                    'width' => 540,
+                    'height' => 400,
+                ],
+        ];
     }
 
     /**
