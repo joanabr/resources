@@ -100,6 +100,32 @@ class HCResourceController extends HCBaseController
         try {
             $record = $this->service->upload($request->getFile(), $request->getLastModified());
 
+            $data = $request->all();
+
+            if (sizeof($data) > 2) {
+                array_forget($data, ['file', 'lastModified']);
+
+                /** @var \HoneyComb\Resources\Models\HCResource $recordM */
+                $recordM = $this->service->getRepository()->find($record['id']);
+                $recordM->update($data);
+
+                $translation = [
+                    'language_code' => app()->getLocale(),
+                    'label' => ''
+                ];
+
+                foreach ($data as $key => $value) {
+                    if (strpos($key, 'translation_') !== false) {
+                        $key = explode('_', $key)[1];
+
+                        $translation[$key] = $value;
+                    }
+                }
+
+                $recordM->translation()->create($translation);
+
+            }
+
             $this->connection->commit();
         } catch (\Throwable $exception) {
             $this->connection->rollBack();
