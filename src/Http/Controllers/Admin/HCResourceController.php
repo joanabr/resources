@@ -3,7 +3,7 @@
  * @copyright 2018 interactivesolutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
+ * of this software and associated documentation files (the 'Software'), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -12,7 +12,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -126,7 +126,7 @@ class HCResourceController extends HCBaseController
     public function getById(string $id)
     {
         return $this->service->getRepository()->makeQuery()->with([
-            'author' => function (HasOne $builder) {
+            'author' => function(HasOne $builder) {
                 $builder->select('id', 'name as label');
             },
         ])->find($id);
@@ -157,38 +157,11 @@ class HCResourceController extends HCBaseController
     }
 
     /**
-     * @param HCResourceRequest $request
-     * @return JsonResponse
-     * @throws \Exception
-     */
-    public function store(HCResourceRequest $request): JsonResponse
-    {
-        $this->connection->beginTransaction();
-
-        try {
-            /** @var HCResource $record */
-            $record = $this->service->getRepository()->create($request->getRecordData());
-            $record->updateTranslations($request->getTranslations());
-
-            $this->connection->commit();
-        } catch (\Throwable $exception) {
-            $this->connection->rollBack();
-
-            report($exception);
-
-            return $this->response->error($exception->getMessage());
-        }
-
-        event(new HCResourceCreated($record));
-
-        return $this->response->success("Created");
-    }
-
-    /**
      * Updating menu group record
      *
      * @param HCResourceRequest $request
      * @param string $id
+     * @param bool $returnData
      * @return JsonResponse
      */
     public function update(HCResourceRequest $request, string $id): JsonResponse
@@ -203,8 +176,7 @@ class HCResourceController extends HCBaseController
 
             event(new HCResourceUpdated($record));
         }
-
-        return $this->response->success("Created");
+        return $this->response->success('Updated', $record);
     }
 
     /**

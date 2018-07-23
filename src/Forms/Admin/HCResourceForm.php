@@ -54,15 +54,12 @@ class HCResourceForm extends HCBaseForm
         $form = [
             'storageUrl' => route('admin.api.resource'),
             'structure' => $this->getStructure($edit),
-        ];
-
-        if ($edit) {
-            $form['buttons'] = [
+            'buttons' => [
                 'submit' => [
                     'label' => $this->getSubmitLabel($edit),
                 ],
-            ];
-        }
+            ]
+        ];
 
         if ($this->multiLanguage) {
             $form['availableLanguages'] = getHCContentLanguages();
@@ -78,32 +75,13 @@ class HCResourceForm extends HCBaseForm
     public function getStructureNew(string $prefix): array
     {
         return [
-            $prefix . 'media' =>
+            $prefix . 'id' =>
                 [
                     'tab' => trans('HCResource::resource.resource'),
                     'type' => 'media',
                     'viewUrl' => route('resource.get', '/'),
                     'uploadUrl' => route('resource.upload'),
                     'editUrl' => route('admin.api.form-manager', ['resource-edit']),
-                    'hideDelete' => 1,
-                    'width' => 540,
-                    'height' => 400,
-                ],
-        ];
-    }
-
-    /**
-     * @param string $prefix
-     * @return array
-     */
-    public function getStructureEdit(string $prefix): array
-    {
-        return [
-            $prefix . 'id' =>
-                [
-                    'tab' => trans('HCResource::resource.resource'),
-                    'type' => 'media',
-                    'viewUrl' => route('resource.get', '/'),
                     'hideDelete' => 1,
                     'hideEdit' => 1,
                     'width' => 540,
@@ -116,6 +94,12 @@ class HCResourceForm extends HCBaseForm
                     'label' => trans('HCResource::resource.author'),
                     'new' => route('admin.api.form-manager', ['resource.author-new']),
                     'searchUrl' => route('admin.api.resource.author.options'),
+                    'dependencies' =>
+                        [
+                            'id' => [
+                                'ignore' => 1
+                            ]
+                        ]
                 ],
             $prefix . 'translations.label' =>
                 [
@@ -124,6 +108,10 @@ class HCResourceForm extends HCBaseForm
                     'label' => trans('HCResource::resource.label'),
                     'multiLanguage' => 1,
                     'required' => 1,
+                    'dependencies' =>
+                        [
+                            'id' => []
+                        ]
                 ],
             $prefix . 'translations.caption' =>
                 [
@@ -131,6 +119,10 @@ class HCResourceForm extends HCBaseForm
                     'type' => 'textArea',
                     'label' => trans('HCResource::resource.caption'),
                     'multiLanguage' => 1,
+                    'dependencies' =>
+                        [
+                            'id' => []
+                        ]
                 ],
             $prefix . 'translations.alt_text' =>
                 [
@@ -138,6 +130,10 @@ class HCResourceForm extends HCBaseForm
                     'type' => 'singleLine',
                     'label' => trans('HCResource::resource.alt_text'),
                     'multiLanguage' => 1,
+                    'dependencies' =>
+                        [
+                            'id' => []
+                        ]
                 ],
             $prefix . 'translations.description' =>
                 [
@@ -145,7 +141,20 @@ class HCResourceForm extends HCBaseForm
                     'type' => 'textArea',
                     'label' => trans('HCResource::resource.description'),
                     'multiLanguage' => 1,
+                    'dependencies' =>
+                        [
+                            'id' => []
+                        ]
                 ],
         ];
+    }
+
+    /**
+     * @param string $prefix
+     * @return array
+     */
+    public function getStructureEdit(string $prefix): array
+    {
+        return $this->getStructureNew($prefix);
     }
 }
