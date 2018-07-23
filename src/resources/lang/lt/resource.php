@@ -43,4 +43,5 @@ return [
     'description' => 'Aprašymas',
     'full_path' => 'Pilnas kelias',
     'resource' => 'Resursas',
+    'tags' => 'Žymės',
 ];

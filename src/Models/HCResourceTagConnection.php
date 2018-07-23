@@ -29,25 +29,23 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Models;
 
-use HoneyComb\Starter\Models\HCUuidSoftModel;
-use HoneyComb\Starter\Models\Traits\HCTranslation;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use HoneyComb\Starter\Models\HCUuidModel;
+
 
 /**
- * Class HCResource
+ * Class HCResourceTagConnection
  * @package HoneyComb\Resources\Models
  */
-class HCResource extends HCUuidSoftModel
+class HCResourceTagConnection extends HCUuidModel
 {
-    use HCTranslation;
+    
 
     /**
      * The database table used by the model.
      *
      * @var string
      */
-    protected $table = 'hc_resource';
+    protected $table = 'hc_resource_tag_connection';
 
     /**
      * The attributes that are mass assignable.
@@ -55,60 +53,14 @@ class HCResource extends HCUuidSoftModel
      * @var array
      */
     protected $fillable = [
-        'id',
-        'uploaded_by',
-        'path',
-        'original_name',
-        'safe_name',
-        'extension',
-        'mime_type',
-        'size',
-        'checksum',
-        'author_id',
-        'original_at',
-        'disk',
+        "resource_id", "tag_id"
     ];
 
+    /**
+     * @var array
+     */
     protected $with = [
-        'author',
-        'translation',
-        'translations',
-        'tags',
+        
     ];
 
-    /**
-     * Get file path of the resource
-     *
-     * @return string
-     */
-    public function file_path(): string
-    {
-        return storage_path('app' . DIRECTORY_SEPARATOR . $this->path);
-    }
-
-    /**
-     * Check if resource is image
-     *
-     * @return bool
-     */
-    public function isImage(): bool
-    {
-        return strpos($this->mime_type, 'image') !== false;
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function author(): HasOne
-    {
-        return $this->hasOne(HCResourceAuthor::class, 'id', 'author_id');
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function tags(): BelongsToMany
-    {
-        return $this->belongsToMany(HCResourceTag::class, HCResourceTagConnection::getTableName(), 'resource_id', 'tag_id');
-    }
 }

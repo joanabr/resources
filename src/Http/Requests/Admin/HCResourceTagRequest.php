@@ -21,22 +21,17 @@
  * SOFTWARE.
  *
  * Contact InteractiveSolutions:
- * E-mail: hello@interactivesolutions.lt
+ * E-mail: info@interactivesolutions.lt
  * http://www.interactivesolutions.lt
  */
 
 declare(strict_types = 1);
 
-namespace HoneyComb\Resources\Requests\Admin;
+namespace HoneyComb\Resources\Http\Requests\Admin;
 
-use HoneyComb\Resources\Repositories\Admin\HCResourceTagRepository;
 use Illuminate\Foundation\Http\FormRequest;
 
-/**
- * Class HCResourceRequest
- * @package HoneyComb\Resources\Requests\Admin
- */
-class HCResourceRequest extends FormRequest
+class HCResourceTagRequest extends FormRequest
 {
     /**
      * Get request inputs
@@ -45,22 +40,7 @@ class HCResourceRequest extends FormRequest
      */
     public function getRecordData(): array
     {
-        $data = $this->all();
-        $data['author_id'] = $this->getAuthorId();
-
-        return $data;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getAuthorId(): ?string
-    {
-        if ($this->has('author')) {
-            return $this->input('author.id');
-        }
-
-        return null;
+        return $this->all();
     }
 
     /**
@@ -81,31 +61,6 @@ class HCResourceRequest extends FormRequest
     public function getTranslations(): array
     {
         return $this->input('translations', []);
-    }
-
-    public function getTags(HCResourceTagRepository $repository)
-    {
-        $tags = $this->input('tags') ? $this->input('tags') : [];
-
-        $tag_ids = [];
-
-        foreach ($tags as $tag) {
-            if (isset($tag['className'])) {
-                $tag['id'] = str_slug($tag['id']);
-                $new_tag = $repository->makeQuery()->create($tag);
-                $tag_ids[] = $new_tag->id;
-            } else {
-                if (isset($tag['id'])) {
-                    $tag_ids[] = $tag['id'];
-                } else {
-                    $tag_ids = $tags;
-
-                    return $tag_ids;
-                }
-            }
-        }
-
-        return $tag_ids;
     }
 
     /**
@@ -133,15 +88,14 @@ class HCResourceRequest extends FormRequest
                     ];
                 }
 
-                return [
-                    'file' => 'required',
-                ];
+                return [];
 
             case 'PUT':
 
-                return [
-                    'translations' => 'required|array|min:1',
-                ];
+                return [];
+
+            case 'PATCH':
+                return [];
 
             case 'DELETE':
                 return [

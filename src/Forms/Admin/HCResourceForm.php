@@ -95,12 +95,26 @@ class HCResourceForm extends HCBaseForm
                     'new' => route('admin.api.form-manager', ['resource.author-new']),
                     'searchUrl' => route('admin.api.resource.author.options'),
                     'dependencies' =>
-                        [
-                            'id' => [
-                                'ignore' => 1
-                            ]
+                    [
+                        'id' => [
+                            'ignore' => 1
                         ]
+                    ]
                 ],
+            $prefix . 'tags' => [
+                'tab' => trans('HCResource::resource.resource'),
+                'type' => 'dropDownSearchable',
+                'creatable' => true,
+                'multi' => true,
+                'label' => trans('HCResource::resource.tags'),
+                'searchUrl' => route('admin.api.resource.tag.options'),
+                'dependencies' =>
+                    [
+                        'id' => [
+                            'ignore' => 1
+                        ]
+                    ]
+            ],
             $prefix . 'translations.label' =>
                 [
                     'tab' => trans('HCResource::resource.resource'),
@@ -109,9 +123,9 @@ class HCResourceForm extends HCBaseForm
                     'multiLanguage' => 1,
                     'required' => 1,
                     'dependencies' =>
-                        [
-                            'id' => []
-                        ]
+                    [
+                        'id' => []
+                    ]
                 ],
             $prefix . 'translations.caption' =>
                 [
@@ -120,9 +134,9 @@ class HCResourceForm extends HCBaseForm
                     'label' => trans('HCResource::resource.caption'),
                     'multiLanguage' => 1,
                     'dependencies' =>
-                        [
-                            'id' => []
-                        ]
+                    [
+                        'id' => []
+                    ]
                 ],
             $prefix . 'translations.alt_text' =>
                 [
@@ -131,9 +145,9 @@ class HCResourceForm extends HCBaseForm
                     'label' => trans('HCResource::resource.alt_text'),
                     'multiLanguage' => 1,
                     'dependencies' =>
-                        [
-                            'id' => []
-                        ]
+                    [
+                        'id' => []
+                    ]
                 ],
             $prefix . 'translations.description' =>
                 [
@@ -142,9 +156,9 @@ class HCResourceForm extends HCBaseForm
                     'label' => trans('HCResource::resource.description'),
                     'multiLanguage' => 1,
                     'dependencies' =>
-                        [
-                            'id' => []
-                        ]
+                    [
+                        'id' => []
+                    ]
                 ],
         ];
     }

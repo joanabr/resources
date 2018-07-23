@@ -8,7 +8,8 @@
         "resource.author": "HoneyComb\\Resources\\Forms\\Admin\\HCResourceAuthorForm",
         "resource.thumb": "HoneyComb\\Resources\\Forms\\HCResourceThumbForm",
         "resource": "HoneyComb\\Resources\\Forms\\Admin\\HCResourceForm",
-        "resource.grab-editor": "HoneyComb\\Resources\\Forms\\Admin\\HCResourceGrabPropertyForm"
+        "resource.grab-editor": "HoneyComb\\Resources\\Forms\\Admin\\HCResourceGrabPropertyForm",
+        "resource.tag": "HoneyComb\\Resources\\Forms\\Admin\\HCResourceTagForm"
     },
     "adminMenu": [
         {
@@ -38,6 +39,13 @@
             "translation": "HCResource::resource_grab_property.page_title",
             "icon": "object-ungroup",
             "aclPermission": "honey_comb_resources_resource_grab_property_list"
+        },
+        {
+            "route": "admin.resource.tag.index",
+            "parent": "admin.resource.index",
+            "translation": "HCResource::resources_tags.page_title",
+            "icon": "tags",
+            "aclPermission": "honey_comb_resources_resources_tags_list"
         }
     ],
     "seeder": "",
@@ -46,7 +54,8 @@
         "Routes\/Admin\/routes.resource.authors.php",
         "Routes\/Admin\/routes.resource.thumb.php",
         "Routes\/Admin\/routes.resource.grab.property.php",
-        "Routes\/Admin\/routes.resource.php"
+        "Routes\/Admin\/routes.resource.php",
+        "Routes\/Admin\/routes.resource.tag.php"
     ],
     "acl": {
         "permissions": [
@@ -89,6 +98,17 @@
                     "honey_comb_resources_resource_grab_property_create",
                     "honey_comb_resources_resource_grab_property_delete",
                     "honey_comb_resources_resource_grab_property_list"
+                ]
+            },
+            {
+                "name": "acl.resource.tag",
+                "controller": "HoneyComb\\Resources\\Http\\Controllers\\Admin\\HCResourceTagController",
+                "actions": [
+                    "honey_comb_resources_resources_tags_update",
+                    "honey_comb_resources_resources_tags_create",
+                    "honey_comb_resources_resources_tags_delete",
+                    "honey_comb_resources_resources_tags_restore",
+                    "honey_comb_resources_resources_tags_list"
                 ]
             }
         ]

@@ -38,6 +38,7 @@ use HoneyComb\Resources\Events\Admin\Resource\HCResourceSoftDeleted;
 use HoneyComb\Resources\Events\Admin\Resource\HCResourceUpdated;
 use HoneyComb\Resources\Models\HCResource;
 use HoneyComb\Resources\Requests\Admin\HCResourceRequest;
+use HoneyComb\Resources\Services\Admin\HCResourceTagService;
 use HoneyComb\Resources\Services\HCResourceService;
 use HoneyComb\Starter\Helpers\HCFrontendResponse;
 use Illuminate\Database\Connection;
@@ -67,18 +68,28 @@ class HCResourceController extends HCBaseController
      * @var HCFrontendResponse
      */
     protected $response;
+    /**
+     * @var \HoneyComb\Resources\Services\Admin\HCResourceTagService
+     */
+    private $resourceTagService;
 
     /**
      * HCResourceController constructor.
      * @param Connection $connection
      * @param HCFrontendResponse $response
      * @param HCResourceService $service
+     * @param \HoneyComb\Resources\Services\Admin\HCResourceTagService $resourceTagService
      */
-    public function __construct(Connection $connection, HCFrontendResponse $response, HCResourceService $service)
-    {
+    public function __construct(
+        Connection $connection,
+        HCFrontendResponse $response,
+        HCResourceService $service,
+        HCResourceTagService $resourceTagService
+    ) {
         $this->connection = $connection;
         $this->response = $response;
         $this->service = $service;
+        $this->resourceTagService = $resourceTagService;
     }
 
     /**
@@ -170,12 +181,14 @@ class HCResourceController extends HCBaseController
         $record = $this->service->getRepository()->findOneBy(['id' => $id]);
         $record->update($request->getRecordData());
         $record->updateTranslations($request->getTranslations());
+        $record->tags()->sync($request->getTags($this->resourceTagService->getRepository()));
 
         if ($record) {
             $record = $this->service->getRepository()->find($id);
 
             event(new HCResourceUpdated($record));
         }
+
         return $this->response->success('Updated', $record);
     }
 
