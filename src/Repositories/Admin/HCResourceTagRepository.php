@@ -6,7 +6,7 @@ namespace HoneyComb\Resources\Repositories\Admin;
 
 use HoneyComb\Resources\Models\HCResourceTag;
 use HoneyComb\Resources\Http\Requests\Admin\HCResourceTagRequest;
-use HoneyComb\Core\Repositories\Traits\HCQueryBuilderTrait;
+use HoneyComb\Starter\Repositories\Traits\HCQueryBuilderTrait;
 use HoneyComb\Starter\Repositories\HCBaseRepository;
 
 class HCResourceTagRepository extends HCBaseRepository

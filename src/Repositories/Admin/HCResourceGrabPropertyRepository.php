@@ -6,7 +6,7 @@ namespace HoneyComb\Resources\Repositories\Admin;
 
 use HoneyComb\Resources\Models\HCResourceGrabProperty;
 use HoneyComb\Resources\Http\Requests\Admin\HCResourceGrabPropertyRequest;
-use HoneyComb\Core\Repositories\Traits\HCQueryBuilderTrait;
+use HoneyComb\Starter\Repositories\Traits\HCQueryBuilderTrait;
 use HoneyComb\Starter\Repositories\HCBaseRepository;
 
 class HCResourceGrabPropertyRepository extends HCBaseRepository
