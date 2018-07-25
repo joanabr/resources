@@ -111,7 +111,7 @@ class HCResourceController extends HCBaseController
 
                 $translation = [
                     'language_code' => app()->getLocale(),
-                    'label' => ''
+                    'label' => '',
                 ];
 
                 foreach ($data as $key => $value) {
@@ -119,11 +119,14 @@ class HCResourceController extends HCBaseController
                         $key = explode('_', $key)[1];
 
                         $translation[$key] = $value;
+                    } else {
+                        if ($key === 'tags') {
+                            $recordM->tags()->sync(explode(',', $value));
+                        }
                     }
                 }
 
                 $recordM->translation()->create($translation);
-
             }
 
             $this->connection->commit();
