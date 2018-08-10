@@ -118,7 +118,7 @@ class HCResourceService
         }
 
         // cache resource for 10 days
-        $resource = Cache::remember($id, 60 * 24 * 10, function() use ($id) {
+        $resource = Cache::remember($id, 60 * 24 * 10, function () use ($id) {
             return $this->getRepository()->find($id);
         });
 
@@ -269,7 +269,7 @@ class HCResourceService
 
         $resource = $resource->toArray();
         // set storage resource url
-        $resource['storageUrl'] = $this->isLocal($disk) ? null : Storage::disk($disk)->url($resource['path']);
+        $resource['storageUrl'] = $this->isLocalOrPublic($disk) ? null : Storage::disk($disk)->url($resource['path']);
 
         return $resource;
     }
@@ -440,6 +440,7 @@ class HCResourceService
                 if ($this->headerCallAttempts < 5) {
 
                     $this->headerCallAttempts++;
+
                     return $this->getFileName($fileName);
                 }
 
@@ -534,8 +535,8 @@ class HCResourceService
         int $height = 0,
         $fit = null
     ): string {
-        if ($this->isLocal($disk)) {
-            $folder = config('filesystems.disks.local.root') . '/cache/' . str_replace('-', '/', $resourceId);
+        if ($this->isLocalOrPublic($disk)) {
+            $folder = config('filesystems.disks.' . $disk . '.root') . '/cache/' . str_replace('-', '/', $resourceId);
 
             if (!is_dir($folder)) {
                 mkdir($folder, 0755, true);
@@ -574,9 +575,9 @@ class HCResourceService
             $height = null;
         }
 
-        if ($this->isLocal($disk)) {
-            $source = config('filesystems.disks.local.root') . DIRECTORY_SEPARATOR . $source;
-            $destination = config('filesystems.disks.local.root') . DIRECTORY_SEPARATOR . $destination;
+        if ($this->isLocalOrPublic($disk)) {
+            $source = config('filesystems.disks.' . $disk . '.root') . DIRECTORY_SEPARATOR . $source;
+            $destination = config('filesystems.disks.' . $disk . '.root') . DIRECTORY_SEPARATOR . $destination;
         } else {
             $source = Storage::disk($disk)->url($source);
         }
@@ -585,17 +586,17 @@ class HCResourceService
         $image = Image::make($source);
 
         if ($fit) {
-            $image->fit($width, $height, function(Constraint $constraint) {
+            $image->fit($width, $height, function (Constraint $constraint) {
                 $constraint->upsize();
             });
         } else {
-            $image->resize($width, $height, function(Constraint $constraint) {
+            $image->resize($width, $height, function (Constraint $constraint) {
                 $constraint->upsize();
                 $constraint->aspectRatio();
             });
         }
 
-        if ($this->isLocal($disk)) {
+        if ($this->isLocalOrPublic($disk)) {
             $image->save($destination);
         } else {
             Storage::disk($disk)->put($destination, (string)$image->encode());
@@ -638,6 +639,24 @@ class HCResourceService
     protected function isLocal(string $disk): bool
     {
         return $disk == 'local';
+    }
+
+    /**
+     * @param string $disk
+     * @return bool
+     */
+    protected function isLocalOrPublic(string $disk): bool
+    {
+        return $disk == 'local' || $disk == 'public';
+    }
+
+    /**
+     * @param string $disk
+     * @return bool
+     */
+    protected function isPublic(string $disk): bool
+    {
+        return $disk == 'public';
     }
 
     /**

@@ -52,7 +52,7 @@ class HCResourceRepository extends HCBaseRepository
     {
         return HCResource::class;
     }
-    
+
     /**
      * @return null|string
      */
@@ -80,7 +80,7 @@ class HCResourceRepository extends HCBaseRepository
         $params['original_name'] = $file->getClientOriginalName();
         $params['extension'] = '.' . $file->getClientOriginalExtension();
         $params['path'] = $this->uploadPath . $params['id'] . $params['extension'];
-        $params['size'] = $file->getClientSize();
+        $params['size'] = $file->getSize();
         $params['mime_type'] = $file->getClientMimeType();
 
         return $params;
@@ -93,6 +93,8 @@ class HCResourceRepository extends HCBaseRepository
     {
         if ($resource->disk == 'local') {
             $filePath = config('filesystems.disks.local.root') . DIRECTORY_SEPARATOR . $resource->path;
+        } elseif ($resource->disk == 'public') {
+            $filePath = config('filesystems.disks.public.root') . DIRECTORY_SEPARATOR . $resource->path;
         } else {
             $filePath = Storage::disk($resource->disk)->url($resource->path);
         }
