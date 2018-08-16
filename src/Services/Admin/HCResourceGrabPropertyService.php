@@ -115,7 +115,7 @@ class HCResourceGrabPropertyService
             $height = (integer)($thumbnail->height * $scale);
         }
 
-        if ($data['x'] == null && $data['y'] == null) {
+        if (is_null($data['x']) && is_null($data['y'])) {
             $data['x'] = -($thumbnail->width - $image->width() / $scale) * 0.5;
             $data['y'] = -($thumbnail->height - $image->height() / $scale) * 0.5;
         }
