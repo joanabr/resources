@@ -50,7 +50,9 @@ class HCResourceAuthor extends HCUuidSoftModel
      * @var array
      */
     protected $fillable = [
-        "id",
-        "name",
+        'id',
+        'name',
+        'copyright',
+        'description',
     ];
 }
