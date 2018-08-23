@@ -123,5 +123,6 @@ class HCResourceGrabPropertyService
         $image->crop($width, $height, abs((integer)($data['x'] * $scale)), abs((integer)($data['y'] * $scale)));
         $image->resize($thumbnail->width, $thumbnail->height);
         $image->save($destination);
+        $image->destroy();
     }
 }

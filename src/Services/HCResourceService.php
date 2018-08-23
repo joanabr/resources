@@ -598,6 +598,7 @@ class HCResourceService
 
         if ($this->isLocalOrPublic($disk)) {
             $image->save($destination);
+            $image->destroy();
         } else {
             Storage::disk($disk)->put($destination, (string)$image->encode());
         }
