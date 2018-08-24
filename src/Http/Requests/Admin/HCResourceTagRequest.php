@@ -88,7 +88,9 @@ class HCResourceTagRequest extends FormRequest
                     ];
                 }
 
-                return [];
+                return [
+                    'label' => 'required|max:255',
+                ];
 
             case 'PUT':
 

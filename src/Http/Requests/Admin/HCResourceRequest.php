@@ -87,25 +87,29 @@ class HCResourceRequest extends FormRequest
     {
         $tags = $this->input('tags') ? $this->input('tags') : [];
 
-        $tag_ids = [];
+        $tagIds = [];
 
         foreach ($tags as $tag) {
-            if (isset($tag['className'])) {
-                $tag['id'] = str_slug($tag['id']);
-                $new_tag = $repository->makeQuery()->create($tag);
-                $tag_ids[] = $new_tag->id;
-            } else {
-                if (isset($tag['id'])) {
-                    $tag_ids[] = $tag['id'];
-                } else {
-                    $tag_ids = $tags;
+            if (is_null($tag['id'])) {
+                continue;
+            }
 
-                    return $tag_ids;
+            if (array_has($tag, 'className')) {
+                $newTag = $repository->makeQuery()->firstOrCreate([
+                    'id' => strtolower($tag['id']),
+                ], [
+                    'name' => $tag['name'],
+                ]);
+
+                $tagIds[] = $newTag->id;
+            } else {
+                if ($tag['id']) {
+                    $tagIds[] = $tag['id'];
                 }
             }
         }
 
-        return $tag_ids;
+        return $tagIds;
     }
 
     /**

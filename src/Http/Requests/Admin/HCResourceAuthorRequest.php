@@ -93,7 +93,7 @@ class HCResourceAuthorRequest extends FormRequest
                 }
 
                 return [
-                    'name' => 'required|min:2',
+                    'name' => 'required|min:2|max:255',
                 ];
 
             case 'PUT':
