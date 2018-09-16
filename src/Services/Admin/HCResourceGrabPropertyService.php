@@ -99,28 +99,7 @@ class HCResourceGrabPropertyService
         /** @var \Intervention\Image\Image $image */
         $image = Image::make($source);
 
-        if ($image->width() < $image->height()) {
-            $scale = $image->width() / $thumbnail->width;
-        } else {
-            $scale = $image->height() / $thumbnail->height;
-        }
-
-        $width = (integer)($thumbnail->width * $scale);
-        $height = (integer)($thumbnail->height * $scale);
-
-        if ($width > $image->width()) {
-            $scale = $image->width() / $thumbnail->width;
-
-            $width = (integer)($thumbnail->width * $scale);
-            $height = (integer)($thumbnail->height * $scale);
-        }
-
-        if (is_null($data['x']) && is_null($data['y'])) {
-            $data['x'] = -($thumbnail->width - $image->width() / $scale) * 0.5;
-            $data['y'] = -($thumbnail->height - $image->height() / $scale) * 0.5;
-        }
-
-        $image->crop($width, $height, abs((integer)($data['x'] * $scale)), abs((integer)($data['y'] * $scale)));
+        $image->crop((integer)$data['width'], (integer)$data['height'], (integer)$data['x'], (integer)$data['y']);
         $image->resize($thumbnail->width, $thumbnail->height);
         $image->save($destination);
         $image->destroy();

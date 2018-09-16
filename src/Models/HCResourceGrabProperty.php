@@ -59,6 +59,8 @@ class HCResourceGrabProperty extends HCUuidModel
         "x",
         "y",
         "zoom",
+        "width",
+        "height",
     ];
 
     /**
