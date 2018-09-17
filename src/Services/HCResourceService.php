@@ -245,7 +245,7 @@ class HCResourceService
     ): array {
         try {
             if (is_null($disk)) {
-                $disk = config('filesystems.default');
+                $disk = config('resources.upload_disk');
             }
 
             /** @var HCResource $resource */

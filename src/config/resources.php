@@ -31,4 +31,9 @@ return [
      *  Max file size which will generate checksum
      */
     'max_checksum_size' => env('MAX_CHECKSUM_SIZE', 102400000),
+
+    /**
+     * resources upload disk
+     */
+    'upload_disk' => env('RESOURCES_UPLOAD_DISK', 'local')
 ];
