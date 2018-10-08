@@ -29,14 +29,14 @@ declare(strict_types = 1);
 
 namespace HoneyComb\Resources\Services;
 
-use HoneyComb\Resources\Jobs\ProcessPreviewImage;
 use HoneyComb\Resources\Models\HCResource;
 use HoneyComb\Resources\Repositories\Admin\HCResourceRepository;
+use HoneyComb\Resources\Jobs\ProcessPreviewImage;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Constraint;
-use Intervention\Image\Image;
+use Intervention\Image\Facades\Image;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
@@ -235,16 +235,15 @@ class HCResourceService
      * @param string|null $lastModified
      * @param string|null $disk
      * @param string|null $customId
-     * @param array|null $previewSizes
      * @return array
-     * @throws Throwable
+     * @throws \Throwable
      */
     public function upload(
         UploadedFile $file,
         string $lastModified = null,
         string $disk = null,
         string $customId = null,
-        ?array $previewSizes = null
+        $previewSizes = null
     ): array {
         try {
             if (is_null($disk)) {
@@ -276,76 +275,6 @@ class HCResourceService
         $resource['storageUrl'] = $this->isLocalOrPublic($disk) ? null : Storage::disk($disk)->url($resource['path']);
 
         return $resource;
-    }
-
-    /**
-     * @param HCResource $resource
-     * @param string|null $disk
-     * @param array|null $previewSizes
-     */
-    protected function createPreviewThumb(HCResource $resource, string $disk = null, ?array $previewSizes = null): void
-    {
-        $imagePreview = config('hc.image_preview');
-        if (isset($imagePreview)) {
-            $path = config('filesystems.disks.' . $disk . '.root');
-
-            $destinationPath = $path . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'preview';
-            $source = $path . DIRECTORY_SEPARATOR . $resource->path;
-
-            $itemsInstant = array_where($imagePreview, function ($value, $key) use ($previewSizes) {
-                return ($value['generate'] && ($value['default'] ||
-                        isset($previewSizes) && in_array($value['width'] . 'x' . $value['height'], $previewSizes)));
-            });
-
-            $itemsJob = array_where($imagePreview, function ($value, $key) use ($previewSizes) {
-                return (!$value['generate'] && ($value['default'] ||
-                        isset($previewSizes) && in_array($value['width'] . 'x' . $value['height'], $previewSizes)));
-            });
-            if ($itemsInstant) {
-                foreach ($itemsInstant as $item) {
-                    $previewWidth = $item['width'];
-                    $previewHeight = $item['height'];
-                    $previewQuality = $item['quality'];
-
-                    $destination = $destinationPath . DIRECTORY_SEPARATOR . $previewWidth . 'x' . $previewHeight;
-                    if (!is_dir($destination)) {
-                        mkdir($destination, 0755, true);
-                    }
-                    $destination .= DIRECTORY_SEPARATOR . $resource->id . '.jpg';
-
-                    /** @var \Intervention\Image\Image $image */
-                    $image = Image::make($source);
-
-                    if ($image->width() < $image->height()) {
-                        $scale = $image->width() / $previewWidth;
-                    } else {
-                        $scale = $image->height() / $previewHeight;
-                    }
-
-                    $width = (integer)($previewWidth * $scale);
-                    $height = (integer)($previewHeight * $scale);
-
-                    if ($width > $image->width()) {
-                        $scale = $image->width() / $previewWidth;
-
-                        $width = (integer)($previewWidth * $scale);
-                        $height = (integer)($previewHeight * $scale);
-                    }
-
-                    $x = ($image->width() - $width) * 0.5;
-                    $y = ($image->height() - $height) * 0.5;
-
-                    $image->crop($width, $height, (integer)($x), (integer)($y));
-                    $image->resize($previewWidth, $previewHeight);
-
-                    $image->save($destination, $previewQuality);
-                    $image->destroy();
-                }
-            }
-            if ($itemsJob) {
-                ProcessPreviewImage::dispatch($resource->id, $itemsJob, $destinationPath, $source);
-            }
-        }
     }
 
     /**
@@ -465,6 +394,74 @@ class HCResourceService
     }
 
     /**
+     * @param HCResource $resource
+     */
+    protected function createPreviewThumb(HCResource $resource, string $disk = null, ?array $previewSizes = null): void
+    {
+        $imagePreview = config('hc.image_preview');
+        if (isset($imagePreview)) {
+
+            $path = config('filesystems.disks.' . $disk . '.root');
+
+            $destinationPath = $path . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'preview';
+            $source = $path . DIRECTORY_SEPARATOR . $resource->path;
+
+            $itemsInstant = array_where($imagePreview, function ($value, $key) use ($previewSizes) {
+                return ($value['generate'] && ($value['default'] ||
+                        isset($previewSizes) && in_array($value['width'] . 'x' . $value['height'], $previewSizes)));
+            });
+
+            $itemsJob = array_where($imagePreview, function ($value, $key) use ($previewSizes) {
+                return (!$value['generate'] && ($value['default'] ||
+                        isset($previewSizes) && in_array($value['width'] . 'x' . $value['height'], $previewSizes)));
+            });
+            if ($itemsInstant) {
+                foreach ($itemsInstant as $item) {
+                    $previewWidth = $item['width'];
+                    $previewHeight = $item['height'];
+                    $previewQuality = $item['quality'];
+
+                    $destination = $destinationPath . DIRECTORY_SEPARATOR . $previewWidth . 'x' . $previewHeight;
+                    if (!is_dir($destination)) {
+                        mkdir($destination, 0755, true);
+                    }
+                    $destination .= DIRECTORY_SEPARATOR . $resource->id . '.jpg';
+                    /** @var \Intervention\Image\Facades\Image $image */
+                    $image = Image::make($source);
+
+                    if ($image->width() < $image->height()) {
+                        $scale = $image->width() / $previewWidth;
+                    } else {
+                        $scale = $image->height() / $previewHeight;
+                    }
+
+                    $width = (integer)($previewWidth * $scale);
+                    $height = (integer)($previewHeight * $scale);
+
+                    if ($width > $image->width()) {
+                        $scale = $image->width() / $previewWidth;
+
+                        $width = (integer)($previewWidth * $scale);
+                        $height = (integer)($previewHeight * $scale);
+                    }
+
+                    $x = ($image->width() - $width) * 0.5;
+                    $y = ($image->height() - $height) * 0.5;
+
+                    $image->crop($width, $height, (integer)($x), (integer)($y));
+                    $image->resize($previewWidth, $previewHeight);
+
+                    $image->save($destination, $previewQuality);
+                    $image->destroy();
+                }
+            }
+            if ($itemsJob) {
+                ProcessPreviewImage::dispatch($resource->id, $itemsJob, $destinationPath, $source);
+            }
+        }
+    }
+
+    /**
      * Remove item from storage
      *
      * @param HCResource $resource
@@ -474,6 +471,26 @@ class HCResourceService
     {
         if (Storage::disk($disk)->has($resource['path'])) {
             Storage::disk($disk)->delete($resource['path']);
+        }
+
+    }
+
+    /**
+     * @param array $ids
+     */
+    public function removePreviewThumb(array $ids): void
+    {
+        $disk = config('resources.upload_disk');
+        $path = config('filesystems.disks.' . $disk . '.root');
+
+        $destination = DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'preview';
+
+        foreach ($ids as $id) {
+            $destinationPath = $destination . DIRECTORY_SEPARATOR . $id . '.jpg';
+
+            if (Storage::disk($disk)->has($destinationPath)) {
+                Storage::disk($disk)->delete($destinationPath);
+            }
         }
     }
 
