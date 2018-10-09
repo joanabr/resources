@@ -400,7 +400,7 @@ class HCResourceService
      */
     protected function createPreviewThumb(HCResource $resource, string $disk = null, ?array $previewSizes = null): void
     {
-        $imagePreview = config('hc.image_preview');
+        $imagePreview = config('resources.image_preview');
         if (isset($imagePreview)) {
 
             $path = config('filesystems.disks.' . $disk . '.root');
