@@ -36,7 +36,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Constraint;
-use Intervention\Image\ImageManagerStatic as Image;
+use Intervention\Image\Facades\Image;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
@@ -395,6 +395,8 @@ class HCResourceService
 
     /**
      * @param HCResource $resource
+     * @param string|null $disk
+     * @param array|null $previewSizes
      */
     protected function createPreviewThumb(HCResource $resource, string $disk = null, ?array $previewSizes = null): void
     {
@@ -404,7 +406,13 @@ class HCResourceService
             $path = config('filesystems.disks.' . $disk . '.root');
 
             $destinationPath = $path . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'preview';
-            $source = $path . DIRECTORY_SEPARATOR . $resource->path;
+            $source = $resource->path;
+
+            if ($this->isLocalOrPublic($disk)) {
+                $source = config('filesystems.disks.' . $disk . '.root') . DIRECTORY_SEPARATOR . $source;
+            } else {
+                $source = Storage::disk($disk)->url($source);
+            }
 
             $itemsInstant = array_where($imagePreview, function ($value, $key) use ($previewSizes) {
                 return ($value['generate'] && ($value['default'] ||
