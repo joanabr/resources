@@ -27,7 +27,6 @@
 
 namespace HoneyComb\Resources\Console;
 
-use HoneyComb\Resources\Services\HCResourceService;
 use Illuminate\Console\Command;
 
 /**
@@ -49,20 +48,12 @@ class HCGenerateDefaultPreviewThumbnails extends Command
      * @var string
      */
     protected $description = 'Generates preview thumbnails in storage public disk';
-    /**
-     * @var HCResourceService
-     */
-    private $resourceService;
+
 
     /**
      * Create a new command instance.
      *
-     * @param HCResourceService $resourceService
      */
-    public function __construct(HCResourceService $resourceService)
-    {
-        $this->resourceService = $resourceService;
-    }
 
     /**
      * Execute the console command.
