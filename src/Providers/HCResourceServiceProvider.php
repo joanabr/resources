@@ -24,15 +24,12 @@
  * E-mail: hello@interactivesolutions.lt
  * http://www.interactivesolutions.lt
  */
-
 declare(strict_types = 1);
-
 namespace HoneyComb\Resources\Providers;
-
 use HoneyComb\Resources\Repositories\Admin\HCResourceRepository;
 use HoneyComb\Resources\Services\HCResourceService;
 use HoneyComb\Starter\Providers\HCBaseServiceProvider;
-
+use HoneyComb\Resources\Console\HCGenerateDefaultPreviewThumbnails;
 /**
  * Class HCResourceServiceProvider
  * @package HoneyComb\Resources\Providers
@@ -43,28 +40,26 @@ class HCResourceServiceProvider extends HCBaseServiceProvider
      * @var string
      */
     protected $homeDirectory = __DIR__;
-
     /**
      * Console commands
      *
      * @var array
      */
-    protected $commands = [];
-
+    protected $commands = [
+        HCGenerateDefaultPreviewThumbnails::class,
+    ];
     /**
      * Controller namespace
      *
      * @var string
      */
     protected $namespace = 'HoneyComb\Resources\Http\Controllers';
-
     /**
      * Provider name
      *
      * @var string
      */
     protected $packageName = 'HCResource';
-
     /**
      *
      */
@@ -73,12 +68,9 @@ class HCResourceServiceProvider extends HCBaseServiceProvider
         $this->mergeConfigFrom(
             $this->packagePath('config/resources.php'), 'hc'
         );
-
         $this->registerRepositories();
-
         $this->registerServices();
     }
-
     /**
      *
      */
@@ -86,7 +78,6 @@ class HCResourceServiceProvider extends HCBaseServiceProvider
     {
         $this->app->singleton(HCResourceRepository::class);
     }
-
     /**
      *
      */
