@@ -28,7 +28,7 @@ declare(strict_types = 1);
 namespace HoneyComb\Resources\Providers;
 use HoneyComb\Resources\Repositories\Admin\HCResourceRepository;
 use HoneyComb\Resources\Services\HCResourceService;
-use HoneyComb\Resources\Console\HCProjectSize;
+use HoneyComb\Resources\Console\HCResourceProjectSize;
 use HoneyComb\Starter\Providers\HCBaseServiceProvider;
 /**
  * Class HCResourceServiceProvider
@@ -46,7 +46,7 @@ class HCResourceServiceProvider extends HCBaseServiceProvider
      * @var array
      */
     protected $commands = [
-        HCProjectSize::class,
+        HCResourceProjectSize::class,
     ];
     /**
      * Controller namespace

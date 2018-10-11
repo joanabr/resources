@@ -10,7 +10,7 @@ use Illuminate\Console\Command;
  * Class HCProjectSize
  * @package HoneyComb\Resources\Console
  */
-class HCProjectSize extends Command
+class HCResourceProjectSize extends Command
 {
     /**
      * The name and signature of the console command.
