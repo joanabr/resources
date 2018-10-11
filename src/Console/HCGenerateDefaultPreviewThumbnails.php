@@ -61,7 +61,6 @@ class HCGenerateDefaultPreviewThumbnails extends Command
      */
     public function __construct(HCResourceService $resourceService)
     {
-        parent::__construct();
         $this->resourceService = $resourceService;
     }
 
@@ -72,6 +71,7 @@ class HCGenerateDefaultPreviewThumbnails extends Command
      */
     public function handle(): void
     {
+        $this->info('sss');
         /*$resources = $this->resourceService->getRepository()->makeQuery()->select('id', 'path', 'mime_type')->get();
 
         foreach ($resources as $resource) {
