@@ -60,7 +60,7 @@ class HCGenerateDefaultPreviewThumbnails extends Command
      *
      * @return mixed
      */
-    public function handle(): void
+    public function handle()
     {
         $this->info('sss');
         /*$resources = $this->resourceService->getRepository()->makeQuery()->select('id', 'path', 'mime_type')->get();
