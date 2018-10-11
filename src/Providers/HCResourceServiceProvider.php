@@ -45,9 +45,7 @@ class HCResourceServiceProvider extends HCBaseServiceProvider
      *
      * @var array
      */
-    protected $commands = [
-        HCResourceProjectSize::class,
-    ];
+    protected $commands = [];
     /**
      * Controller namespace
      *
