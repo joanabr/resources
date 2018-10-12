@@ -32,6 +32,7 @@ namespace HoneyComb\Resources\Providers;
 use HoneyComb\Resources\Repositories\Admin\HCResourceRepository;
 use HoneyComb\Resources\Services\HCResourceService;
 use HoneyComb\Starter\Providers\HCBaseServiceProvider;
+use HoneyComb\Resources\Console\HCGenerateDefaultPreviewThumbnails;
 
 /**
  * Class HCResourceServiceProvider
@@ -49,7 +50,9 @@ class HCResourceServiceProvider extends HCBaseServiceProvider
      *
      * @var array
      */
-    protected $commands = [];
+    protected $commands = [
+        HCGenerateDefaultPreviewThumbnails::class,
+    ];
 
     /**
      * Controller namespace

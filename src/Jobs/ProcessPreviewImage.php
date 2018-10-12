@@ -42,6 +42,7 @@ class ProcessPreviewImage implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+
     /**
      * @var string
      */
@@ -63,10 +64,9 @@ class ProcessPreviewImage implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param string $resourceId
-     * @param array $images
-     * @param string $destinationPath
-     * @param string $sourcePath
+     * @param array $image
+     * @param array $resource
+     * @param array $thumb
      */
     public function __construct(string $resourceId, array $images, string $destinationPath, string $sourcePath)
     {
@@ -93,8 +93,7 @@ class ProcessPreviewImage implements ShouldQueue
                 mkdir($destination, 0755, true);
             }
             $destination .= DIRECTORY_SEPARATOR . $this->resourceId . '.jpg';
-
-            /** @var \Intervention\Image\Image $image */
+            /** @var \Intervention\Image\Facades\Image $image */
             $image = Image::make($this->sourcePath);
 
             if ($image->width() < $image->height()) {
@@ -122,5 +121,23 @@ class ProcessPreviewImage implements ShouldQueue
             $image->save($destination, $previewQuality);
             $image->destroy();
         }
+        /*   $source = config('filesystems.disks.local.root') . DIRECTORY_SEPARATOR . $this->resource['path'];
+           $destination = config('filesystems.disks.local.root') . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR
+               . $this->image['source_type'] . DIRECTORY_SEPARATOR
+               . $this->image['source_id'] . DIRECTORY_SEPARATOR
+               . $this->image['thumbnail_id'] . DIRECTORY_SEPARATOR;
+
+           if (!is_dir($destination)) {
+               mkdir($destination, 0755, true);
+           }
+
+           $destination .= $this->resource['id'] . $this->resource['extension'];
+
+            /** @var \Intervention\Image\Image $image */
+        /* $image = Image::make($source);
+         $image->crop((integer)$this->image['width'], (integer)$this->image['height'], (integer)$this->image['x'], (integer)$this->image['y']);
+         $image->resize($this->thumb['width'], $this->thumb['height']);
+         $image->save($destination);
+         $image->destroy();*/
     }
 }
