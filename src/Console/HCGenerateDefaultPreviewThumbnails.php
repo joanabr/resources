@@ -45,8 +45,8 @@ class HCGenerateDefaultPreviewThumbnails extends Command
     {
         $resources = $this->resourceService->getRepository()->makeQuery()->select('id', 'path', 'mime_type')->get();
 
-        foreach ($resources as $resource) {
+       /* foreach ($resources as $resource) {
             $this->resourceService->createPreviewThumb($resource->id, $resource->path, $resource->mime_type, 'local');
-        }
+        }*/
     }
 }
