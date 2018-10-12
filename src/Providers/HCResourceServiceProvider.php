@@ -74,7 +74,7 @@ class HCResourceServiceProvider extends HCBaseServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(
-            $this->packagePath('config/resources.php'), 'resources'
+            $this->packagePath('config/resources.php'), 'hc'
         );
 
         $this->registerRepositories();
