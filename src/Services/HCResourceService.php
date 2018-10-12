@@ -216,7 +216,7 @@ class HCResourceService
         string $lastModified = null,
         string $disk = null,
         string $customId = null,
-        ?array $previewSizes = null
+        array $previewSizes = []
     ): array {
         try {
             if (is_null($disk)) {
@@ -255,7 +255,7 @@ class HCResourceService
         string $resourcePath,
         string $mimeType,
         string $disk,
-        ?array $previewSizes = null
+        array $previewSizes = []
     ): void {
         $imagePreview = config('resources.image_preview');
         if (isset($imagePreview) && $this->isValidForPreviewThumb($mimeType)) {
